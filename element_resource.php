@@ -189,8 +189,6 @@ else
 			if ( $mode == 'add' && $resource_obj == $resource_type)
 			{
 
-
-
 				// If we have a specific template we use it
 				if(file_exists(dol_buildpath($path.'/core/tpl/resource_'.$element_prop['element'].'_'.$mode.'.tpl.php')))
 				{
