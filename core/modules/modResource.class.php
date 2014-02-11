@@ -128,6 +128,13 @@ class modResource extends DolibarrModules
 					'1',
 					'This is a constant to defined default zoom into link to OSM map',
 					1
+			),
+			1=>array(
+				'MAIN_USE_JQUERY_MULTISELECT',
+				'chaine',
+				'1',
+				'Activate multiselect',
+				1
 			)
 
 		);
