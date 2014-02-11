@@ -125,6 +125,15 @@ else
 
 			// Title
 			print '<tr><td>'.$langs->trans("Title").'</td><td colspan="3">'.$act->label.'</td></tr>';
+
+			// Object linked
+			if (! empty($act->fk_element) && ! empty($act->elementtype))
+			{
+				include_once DOL_DOCUMENT_ROOT.'/core/lib/functions2.lib.php';
+				print '<tr><td>'.$langs->trans("LinkedObject").'</td>';
+				print '<td colspan="3">'.dolGetElementUrl($act->fk_element,$act->elementtype,1).'</td></tr>';
+			}
+
 			print '</table>';
 
 			print '</div>';
