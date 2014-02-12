@@ -51,12 +51,13 @@ $fk_resource	= GETPOST('fk_resource');
 // Get event in an array
 $eventarray=array();
 
-$sql = 'SELECT a.id,a.label,';
+$sql = 'SELECT a.id, a.label,';
 $sql.= ' a.datep,';
 $sql.= ' a.datep2,';
 $sql.= ' a.datea,';
 $sql.= ' a.datea2,';
 $sql.= ' a.percent,';
+$sql.= ' a.code,';
 $sql.= ' a.fk_user_author,a.fk_user_action,a.fk_user_done,';
 $sql.= ' a.priority, a.fulldayevent, a.location,';
 $sql.= ' a.fk_soc, a.fk_contact,';
@@ -97,9 +98,9 @@ if ($filtera > 0 || $filtert > 0 || $filterd > 0)
 $sql.= ' GROUP BY a.id';
 // Sort on date
 $sql.= ' ORDER BY datep';
-//print $sql;
 
-dol_syslog("comm/action/index.php sql=".$sql, LOG_DEBUG);
+dol_syslog("/resource/core.ajax.resource_action.json.php sql=".$sql, LOG_DEBUG);
+
 $resql=$db->query($sql);
 if ($resql)
 {
@@ -108,14 +109,14 @@ if ($resql)
     while ($i < $num)
     {
         $obj = $db->fetch_object($resql);
-
+        $transcode=
         // Create a new object action
         $event=new ActionComm($db);
         $event->id=$obj->id;
         $event->datep=$db->jdate($obj->datep);      // datep and datef are GMT date
         $event->datef=$db->jdate($obj->datep2);
-        $event->type_code=$obj->code;
-        $event->libelle=$obj->label;
+        $event->code=$obj->code;
+        $event->libelle=$langs->trans("Action".$obj->code).' '.$obj->label;
         $event->percentage=$obj->percent;
         $event->author->id=$obj->fk_user_author;	// user id of creator
         $event->usertodo->id=$obj->fk_user_action;	// user id of owner
@@ -144,7 +145,7 @@ else
 foreach ($eventarray as $day => $event) {
 	$event_json[] = array(
 			'id' => $event->id,
-			'title' => $event->libelle,
+			'title' =>  $event->type_code.' '.$event->libelle,
 			'start' => $event->datep,
 			'end' => $event->datef,
 			'end' => $event->datef,
