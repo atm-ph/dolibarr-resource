@@ -139,6 +139,71 @@ class FormResource
     	return $out;
     }
 
+    /**
+     *  Output html form to select a location (place)
+     *
+     *	@param	string	$selected       Preselected type
+     *	@param  string	$htmlname       Name of field in form
+     *  @param  string	$filter         Optionnal filters criteras (example: 's.rowid <> x')
+     *	@param	int		$showempty		Add an empty field
+     * 	@param	int		$showtype		Show third party type in combolist (customer, prospect or supplier)
+     * 	@param	int		$forcecombo		Force to use combo box
+     *  @param	array	$event			Event options. Example: array(array('method'=>'getContacts', 'url'=>dol_buildpath('/core/ajax/contacts.php',1), 'htmlname'=>'contactid', 'params'=>array('add-customer-contact'=>'disabled')))
+     *  @param	string	$filterkey		Filter on key value
+     *  @param	int		$outputmode		0=HTML select string, 1=Array
+     *  @param	int		$limit			Limit number of answers
+     * 	@return	string					HTML string with
+     */
+    function select_resource_list_multi($selected='',$htmlname='fk_resource',$filter='', $showempty=0, $limit=20)
+    {
+    	global $conf,$user,$langs;
+
+    	$out='';
+    	$outarray=array();
+    	$resourcestat = new Resource($this->db);
+    	$resources_used = $resourcestat->fetch_all_used('ASC', 't.rowid', $limit, $offset, $filter='');
+
+    	if ($resources_used)
+    	{
+    		// Construct $out and $outarray
+    		$out.= '<select id="'.$htmlname.'" class="multiselect" multiple="multiple" name="'.$htmlname.'[]">'."\n";
+    		if ($showempty) $out.= '<option value="-1"></option>'."\n";
+    		$num = count($resourcestat->lines);
+
+    		$i = 0;
+    		if ($num)
+    		{
+    			while ( $i < $num)
+    			{
+    				$label=$langs->trans(ucfirst($resourcestat->lines[$i]->objresource->element)).' : ';
+    				$label.=$resourcestat->lines[$i]->objresource->ref?$resourcestat->lines[$i]->objresource->ref:''.$resourcestat->lines[$i]->objresource->label;
+    				if (
+    					($selected > 0 && $selected == $resourcestat->lines[$i]->objresource->id)
+    					|| (is_array($selected) && in_array($resourcestat->lines[$i]->objresource->id,$selected))
+    				)
+    				{
+    					$out.= '<option value="'.$resourcestat->lines[$i]->objresource->id.'" selected="selected">'.$label.'</option>';
+    				}
+    				else
+    				{
+    					$out.= '<option value="'.$resourcestat->lines[$i]->objresource->id.'">'.$label.'</option>';
+    				}
+
+    				$i++;
+    				if (($i % 10) == 0) $out.="\n";
+    			}
+    		}
+    		$out.= '</select>'."\n";
+
+    	}
+    	else
+    	{
+    		dol_print_error($this->db);
+    	}
+
+    	return $out;
+    }
+
 
 }
 

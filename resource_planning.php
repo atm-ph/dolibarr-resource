@@ -56,7 +56,8 @@ $action			= GETPOST('action','alpha');
 
 $start			= GETPOST('start','int');
 $end			= GETPOST('end','int');
-$fk_resource 	= GETPOST('fk_resource','int');
+$fk_resource 	= GETPOST('fk_resource');
+
 
 
 /***************************************************
@@ -64,17 +65,23 @@ $fk_resource 	= GETPOST('fk_resource','int');
 *
 * Put here all code to build page
 ****************************************************/
-$morecss=array("/resource/js/fullcalendar/fullcalendar.css");
+$morecss=array(
+	"/resource/js/fullcalendar/fullcalendar.css",
+	"/resource/inc/multiselect/css/ui.multiselect.css"
+);
 
-$morejs=array("/resource/js/fullcalendar/fullcalendar.js");
-llxHeader('','ResourcePlaning','','','','',$morejs,$morecss,0,0);
+$morejs=array(
+	"/resource/js/fullcalendar/fullcalendar.js",
+	"/resource/inc/multiselect/js/ui.multiselect.js"
+);
+
+$title = $langs->trans('ResourcePlaning');
+
+llxHeader('',$title,'','','','',$morejs,$morecss,0,0);
 
 $form=new Form($db);
 
 
-// Put here content of your page
-
-// Example 1 : Adding jquery code
 print '<script type="text/javascript" language="javascript">
 jQuery(document).ready(function() {
 	$("#calendar").fullCalendar({
@@ -91,7 +98,7 @@ jQuery(document).ready(function() {
             url: "'.dol_buildpath('/resource/core/ajax/resource_action.json.php',1).'",
             type: "POST",
             data: {
-                fk_resource: "'.$fk_resource.'"
+                fk_resource: '.(is_array($fk_resource)?json_encode($fk_resource):'"'.$fk_resource.'"').'
             },
             error: function() {
                 alert("there was an error while fetching events!");
@@ -105,14 +112,44 @@ jQuery(document).ready(function() {
 });
 </script>';
 
+print '<script type="text/javascript">
+$(document).ready(function () {
+	$.extend($.ui.multiselect.locale, {
+		addAll:"'.$langs->transnoentities("AddAll").'",
+		removeAll:"'.$langs->transnoentities("RemoveAll").'",
+		itemsCount:"'.$langs->transnoentities("ItemsCount").'"
+	});
+	$(function(){
+	  $(".multiselect").multiselect({sortable: false, searchable: false});
+	});
+});
+</script>';
+
+
+print '<div class="fichecenter">';
+
+print_fiche_titre($langs->trans('PlanningOfAffectedResources'));
+
+print '<div class="fichethirdleft">';
+
 $formresource = new FormResource($db);
+$out = '<form action="'.$_SERVER["PHP_SELF"].'" method="POST">';
+$out.= '<input type="hidden" name="token" value="'.$_SESSION['newtoken'].'">';
+$out.= $formresource->select_resource_list_multi($fk_resource);
+$out.= '<p><input type="submit" class="button" value="'.$langs->trans("Search").'"> </p>&nbsp; &nbsp; ';
+$out.= '</form>';
 
-print $formresource->select_resource_list();
+print $out;
 
-
-
+print '</div>';
+print '<div class="fichetwothirdright">';
+print '<div class="ficheaddleft">';
 print '<div id="calendar"></div>';
 
+print '</div>';
+print '</div>';
+
+print '</div>';
 
 
 

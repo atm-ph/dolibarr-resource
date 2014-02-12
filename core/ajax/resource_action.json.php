@@ -46,8 +46,7 @@ $action			= GETPOST('action','alpha');
 
 $start			= GETPOST('start','int');
 $end			= GETPOST('end','int');
-$fk_resource	= GETPOST('fk_resource','int');
-
+$fk_resource	= GETPOST('fk_resource');
 
 // Get event in an array
 $eventarray=array();
@@ -65,12 +64,16 @@ $sql.= ' ca.code';
 $sql.= ' FROM ('.MAIN_DB_PREFIX.'c_actioncomm as ca,';
 $sql.= " ".MAIN_DB_PREFIX.'user as u,';
 $sql.= " ".MAIN_DB_PREFIX."actioncomm as a)";
-if($fk_resource > 0) {
+if(is_array($fk_resource) || $fk_resource > 0 ) {
 	$sql .= ' LEFT JOIN '.MAIN_DB_PREFIX.'element_resources as r ON a.id = r.element_id ';
 }
 $sql.= ' WHERE a.fk_action = ca.id';
-if($fk_resource > 0) {
+if(!is_array($fk_resource) && $fk_resource > 0) {
 	$sql.= " AND r.resource_id = '".$db->escape($fk_resource)."'";
+}
+elseif(is_array($fk_resource) and count($fk_resource) > 0)
+{
+	$sql.= " AND r.resource_id IN(".$db->escape(implode($fk_resource,',')).")";
 }
 $sql.= ' AND a.fk_user_author = u.rowid';
 $sql.= ' AND a.entity IN ('.getEntity().')';

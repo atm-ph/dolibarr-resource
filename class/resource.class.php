@@ -238,7 +238,7 @@ class Resource extends CommonObject
     	}
     	$sql.= " GROUP BY t.resource_id";
     	$sql.= " ORDER BY $sortfield $sortorder " . $this->db->plimit( $limit + 1 ,$offset);
-    	dol_syslog(get_class($this)."::fetch_all sql=".$sql, LOG_DEBUG);
+    	dol_syslog(get_class($this)."::fetch_all_used sql=".$sql, LOG_DEBUG);
 
     	$resql=$this->db->query($sql);
     	if ($resql)
@@ -260,8 +260,11 @@ class Resource extends CommonObject
     				$line->mandatory		=	$obj->mandatory;
     				$line->fk_user_create	=	$obj->fk_user_create;
 
-    				$this->lines[$i] = $this->fetchObjectByElement($obj->resource_id,$obj->resource_type);
-
+    				if($obj->resource_id && $obj->resource_type)
+						$line->objresource = $this->fetchObjectByElement($obj->resource_id,$obj->resource_type);
+					if($obj->element_id && $obj->element_type)
+						$line->objelement = $this->fetchObjectByElement($obj->element_id,$obj->element_type);
+        			$this->lines[$i] = $line;
     				$i++;
     			}
     			$this->db->free($resql);
