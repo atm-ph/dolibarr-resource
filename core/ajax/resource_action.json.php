@@ -62,6 +62,9 @@ $sql.= ' a.fk_user_author,a.fk_user_action,a.fk_user_done,';
 $sql.= ' a.priority, a.fulldayevent, a.location,';
 $sql.= ' a.fk_soc, a.fk_contact,';
 $sql.= ' ca.code';
+if( is_array ($fk_resource) || $fk_resource > 0 ) {
+	$sql.= ', r.resource_id';
+}
 $sql.= ' FROM ('.MAIN_DB_PREFIX.'c_actioncomm as ca,';
 $sql.= " ".MAIN_DB_PREFIX.'user as u,';
 $sql.= " ".MAIN_DB_PREFIX."actioncomm as a)";
@@ -74,15 +77,12 @@ if(!is_array($fk_resource) && $fk_resource > 0) {
 }
 elseif(is_array($fk_resource) and count($fk_resource) > 0)
 {
-	$sql.= " AND r.resource_id IN(".$db->escape(implode($fk_resource,',')).")";
+	$sql.= " AND r.resource_id IN (".$db->escape(implode($fk_resource,',')).")";
 }
 $sql.= ' AND a.fk_user_author = u.rowid';
 $sql.= ' AND a.entity IN ('.getEntity().')';
 if ($actioncode) $sql.=" AND ca.code='".$db->escape($actioncode)."'";
 if ($pid) $sql.=" AND a.fk_project=".$db->escape($pid);
-
-
-
 
 if ($type) $sql.= " AND ca.id = ".$type;
 if ($status == 'done') { $sql.= " AND (a.percent = 100 OR (a.percent = -1 AND a.datep2 <= '".$db->idate($now)."'))"; }
@@ -112,6 +112,19 @@ if ($resql)
         $transcode=
         // Create a new object action
         $event=new ActionComm($db);
+        $resourcestat = new Resource($db);
+
+        $resources = $resourcestat->getElementResources($event->element,$obj->id);
+        if ( is_array($resources) && count ( $resources ) > 0 )
+        {
+	        $i=0;
+	        foreach($resources as $nb => $resource)
+	        {
+	        	$event->resources[$i] = $resourcestat->fetchObjectByElement($resource['resource_id'],$resource['resource_type']);
+	        	$i++;
+	        }
+        }
+
         $event->id=$obj->id;
         $event->datep=$db->jdate($obj->datep);      // datep and datef are GMT date
         $event->datef=$db->jdate($obj->datep2);
@@ -130,6 +143,7 @@ if ($resql)
         $event->contact->id=$obj->fk_contact;
 
 
+
         $eventarray[]=$event;
 
         $i++;
@@ -143,6 +157,13 @@ else
 
 //var_dump($eventarray);
 foreach ($eventarray as $day => $event) {
+	if ( is_array($event->resources) && count ( $event->resources ) > 0 )
+	{
+
+
+	}
+
+
 	$event_json[] = array(
 			'id' => $event->id,
 			'title' =>  $event->type_code.' '.$event->libelle,
@@ -150,7 +171,9 @@ foreach ($eventarray as $day => $event) {
 			'end' => $event->datef,
 			'end' => $event->datef,
 			'allDay' => $event->fulldayevent?true:false,
-			'url' => dol_buildpath("/comm/action/fiche.php",1).'?id='. $event->id
+			'url' => dol_buildpath("/comm/action/fiche.php",1).'?id='. $event->id,
+			'backgroundColor' => 'red',
+			'color' => 'white'
 		);
 }
 

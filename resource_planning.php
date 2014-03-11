@@ -45,6 +45,7 @@ if (! $res) die("Include of main fails");
 // Change this following line to use the correct relative path from htdocs
 dol_include_once('/resource/class/resource.class.php');
 dol_include_once('/resource/class/html.formresource.class.php');
+dol_include_once('/resource/lib/resource.lib.php');
 
 // Load traductions files requiredby by page
 $langs->load("companies");
@@ -77,7 +78,7 @@ $morejs=array(
 
 $title = $langs->trans('ResourcePlaning');
 
-llxHeader('',$title,'','','','',$morejs,$morecss,0,0);
+llxHeaderResource('',$title,'','',$morejs,$morecss);
 
 $form=new Form($db);
 
@@ -120,7 +121,7 @@ $(document).ready(function () {
 		itemsCount:"'.$langs->transnoentities("ItemsCount").'"
 	});
 	$(function(){
-	  $(".multiselect").multiselect({sortable: false, searchable: false});
+	  $(".multiselect").multiselect({sortable: false, searchable: true});
 	});
 });
 </script>';
@@ -130,7 +131,7 @@ print '<div class="fichecenter">';
 
 print_fiche_titre($langs->trans('PlanningOfAffectedResources'));
 
-print '<div class="fichethirdleft">';
+//print '<div class="fichethirdleft">';
 
 $formresource = new FormResource($db);
 $out = '<form action="'.$_SERVER["PHP_SELF"].'" method="POST">';
@@ -141,13 +142,13 @@ $out.= '</form>';
 
 print $out;
 
-print '</div>';
-print '<div class="fichetwothirdright">';
-print '<div class="ficheaddleft">';
+//print '</div>';
+//print '<div class="fichetwothirdright">';
+//print '<div class="ficheaddleft">';
 print '<div id="calendar"></div>';
 
-print '</div>';
-print '</div>';
+//print '</div>';
+//print '</div>';
 
 print '</div>';
 
