@@ -57,7 +57,7 @@ $sql.= ' a.datep2,';
 $sql.= ' a.datea,';
 $sql.= ' a.datea2,';
 $sql.= ' a.percent,';
-$sql.= ' a.code,';
+$sql.= ' a.code, a.note,';
 $sql.= ' a.fk_user_author,a.fk_user_action,a.fk_user_done,';
 $sql.= ' a.priority, a.fulldayevent, a.location,';
 $sql.= ' a.fk_soc, a.fk_contact,';
@@ -138,6 +138,7 @@ if ($resql)
         $event->priority=$obj->priority;
         $event->fulldayevent=$obj->fulldayevent;
         $event->location=$obj->location;
+        $event->note=$obj->note;
 
         $event->societe->id=$obj->fk_soc;
         $event->contact->id=$obj->fk_contact;
@@ -159,7 +160,11 @@ else
 foreach ($eventarray as $day => $event) {
 	if ( is_array($event->resources) && count ( $event->resources ) > 0 )
 	{
+		$description = $event->note;
+		foreach($event->resources as $resource_event) {
 
+			$description.= $resource_event->getNomUrl();
+		}
 
 	}
 
@@ -167,13 +172,15 @@ foreach ($eventarray as $day => $event) {
 	$event_json[] = array(
 			'id' => $event->id,
 			'title' =>  $event->type_code.' '.$event->libelle,
+			'description' =>  $description,
 			'start' => $event->datep,
 			'end' => $event->datef,
 			'end' => $event->datef,
 			'allDay' => $event->fulldayevent?true:false,
 			'url' => dol_buildpath("/comm/action/fiche.php",1).'?id='. $event->id,
-			'backgroundColor' => 'red',
-			'color' => 'white'
+			// TODO : associer une couleur au thme et la reprendre ici
+			//'backgroundColor' => 'red',
+			//'color' => 'white'
 		);
 }
 

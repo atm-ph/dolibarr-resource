@@ -68,12 +68,14 @@ $fk_resource 	= GETPOST('fk_resource');
 ****************************************************/
 $morecss=array(
 	"/resource/js/fullcalendar/fullcalendar.css",
-	"/resource/inc/multiselect/css/ui.multiselect.css"
+	"/resource/inc/multiselect/css/ui.multiselect.css",
+	"/resource/js/jquery.qtip.css"
 );
 
 $morejs=array(
 	"/resource/js/fullcalendar/fullcalendar.js",
-	"/resource/inc/multiselect/js/ui.multiselect.js"
+	"/resource/inc/multiselect/js/ui.multiselect.js",
+	"/resource/js/jquery.qtip.js"
 );
 
 $title = $langs->trans('ResourcePlaning');
@@ -105,9 +107,12 @@ jQuery(document).ready(function() {
                 alert("there was an error while fetching events!");
             },
         }
-
-
-    ]
+    ],
+    eventRender: function(event, element) {
+        element.qtip({
+            content: event.description
+        });
+    }
 
 });
 });
