@@ -110,7 +110,16 @@ jQuery(document).ready(function() {
     ],
     eventRender: function(event, element) {
         element.qtip({
-            content: event.description
+            content: {
+                	title: event.action_code + " " + event.title,
+                	text: event.description
+            },
+            position: {
+                	at: \'right center\'
+    		},
+           	show: {
+                	event: \'click mouseenter\'
+    		}
         });
     }
 

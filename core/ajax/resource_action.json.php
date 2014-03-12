@@ -129,7 +129,8 @@ if ($resql)
         $event->datep=$db->jdate($obj->datep);      // datep and datef are GMT date
         $event->datef=$db->jdate($obj->datep2);
         $event->code=$obj->code;
-        $event->libelle=$langs->trans("Action".$obj->code).' '.$obj->label;
+        $event->action_code = $langs->transnoentities("Action".$obj->code);
+        $event->libelle=$obj->label;
         $event->percentage=$obj->percent;
         $event->author->id=$obj->fk_user_author;	// user id of creator
         $event->usertodo->id=$obj->fk_user_action;	// user id of owner
@@ -158,20 +159,25 @@ else
 
 //var_dump($eventarray);
 foreach ($eventarray as $day => $event) {
+
+	$description = $event->note;
 	if ( is_array($event->resources) && count ( $event->resources ) > 0 )
 	{
-		$description = $event->note;
+		$description.="<br /><strong>".$langs->trans('Ressources')."</strong><br />";
 		foreach($event->resources as $resource_event) {
-
+			$description.="<br /><strong>".$langs->trans('Ressources')."</strong><br />";
 			$description.= $resource_event->getNomUrl();
 		}
 
 	}
 
+	$colors = array ('AC_WORKSHOP' => '#95DC16', 'AC_CONFERENC'=> '#F2B579');
 
 	$event_json[] = array(
 			'id' => $event->id,
-			'title' =>  $event->type_code.' '.$event->libelle,
+			'title' =>  $event->libelle,
+			'code' => $event->code,
+			'action_code' => $event->action_code,
 			'description' =>  $description,
 			'start' => $event->datep,
 			'end' => $event->datef,
@@ -179,7 +185,7 @@ foreach ($eventarray as $day => $event) {
 			'allDay' => $event->fulldayevent?true:false,
 			'url' => dol_buildpath("/comm/action/fiche.php",1).'?id='. $event->id,
 			// TODO : associer une couleur au thme et la reprendre ici
-			//'backgroundColor' => 'red',
+			'backgroundColor' => $colors[$event->code]
 			//'color' => 'white'
 		);
 }
