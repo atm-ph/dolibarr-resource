@@ -72,14 +72,15 @@ class FormResource
      */
     function select_resource_list($selected='',$htmlname='fk_resource',$filter='',$showempty=0, $showtype=0, $forcecombo=0, $event=array(), $filterkey='', $outputmode=0, $limit=20)
     {
-    	global $conf,$user,$langs;
+    	global $conf,$langs;
 
     	$out='';
     	$outarray=array();
 
     	$resourcestat = new Resource($this->db);
 
-    	$resources_used = $resourcestat->fetch_all_used('ASC', 't.rowid', $limit, $offset, $filter='');
+    	// FIXME: unused variable
+	    $resources_used = $resourcestat->fetch_all_used('ASC', 't.rowid', $limit, $offset, $filter='');
 
     	$out = '<form action="'.$_SERVER["PHP_SELF"].'" method="POST">';
     	$out.= '<input type="hidden" name="token" value="'.$_SESSION['newtoken'].'">';
@@ -156,10 +157,9 @@ class FormResource
      */
     function select_resource_list_multi($selected='',$htmlname='fk_resource',$filter='', $showempty=0, $limit=20)
     {
-    	global $conf,$user,$langs;
+    	global $langs;
 
     	$out='';
-    	$outarray=array();
     	$resourcestat = new Resource($this->db);
     	$resources_used = $resourcestat->fetch_all_used('ASC', 't.rowid', $limit, $offset, $filter='');
 

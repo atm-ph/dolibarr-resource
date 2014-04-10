@@ -69,7 +69,6 @@ class Resource extends CommonObject
      */
     function fetch($id)
     {
-    	global $langs;
     	$sql = "SELECT";
     	$sql.= " t.rowid,";
    		$sql.= " t.resource_id,";
@@ -130,7 +129,6 @@ class Resource extends CommonObject
      */
     function fetch_all($sortorder, $sortfield, $limit, $offset, $filter='')
     {
-   		global $conf;
    		$sql="SELECT ";
    		$sql.= " t.rowid,";
    		$sql.= " t.resource_id,";
@@ -211,7 +209,6 @@ class Resource extends CommonObject
      */
     function fetch_all_used($sortorder="ASC",$sortfield="t.rowid",$limit, $offset, $filter='')
     {
-    	global $conf;
     	$sql="SELECT ";
     	$sql.= " t.rowid,";
     	$sql.= " t.resource_id,";
@@ -545,7 +542,7 @@ class Resource extends CommonObject
     {
     	$resources = $this->getElementResources($element,$element_id);
     	$i=0;
-    	foreach($resources as $nb => $resource)
+    	foreach($resources as $resource)
     	{
     		$this->lines[$i] = $this->fetchObjectByElement($resource['resource_id'],$resource['resource_type']);
     		$i++;
@@ -582,7 +579,8 @@ class Resource extends CommonObject
     			$interface=new Interfaces($this->db);
     			$result=$interface->run_triggers(strtoupper($element).'_DELETE_RESOURCE',$this,$user,$langs,$conf);
     			if ($result < 0) {
-    				$error++; $this->errors=$interface->errors;
+    				// FIXME: unused variable
+				    $error++; $this->errors=$interface->errors;
     			}
     			// End call triggers
     		}
