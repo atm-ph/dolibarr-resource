@@ -181,7 +181,6 @@ foreach ($eventarray as $day => $event) {
 			'description' =>  $description,
 			'start' => $event->datep,
 			'end' => $event->datef,
-			'end' => $event->datef,
 			'allDay' => $event->fulldayevent?true:false,
 			'url' => dol_buildpath("/comm/action/fiche.php",1).'?id='. $event->id,
 			// TODO : associer une couleur au thme et la reprendre ici
