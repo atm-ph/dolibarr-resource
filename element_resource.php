@@ -261,7 +261,7 @@ else
 			{
 				print '<div class="tabsAction">';
 				print '<div class="inline-block divButAction">';
-				print '<a class="butAction" href="'.$_SERVER['PHP_SELF'].'?mode=add&resource_type='.$resource_obj.'&element='.$element.'&element_id='.$element_id.'">Add resource</a>';
+				print '<a class="butAction" href="'.$_SERVER['PHP_SELF'].'?mode=add&resource_type='.$resource_obj.'&element='.$element.'&element_id='.$element_id.'">' . $langs->trans('AddResource'). '</a>';
 				print '</div>';
 				print '</div>';
 			}

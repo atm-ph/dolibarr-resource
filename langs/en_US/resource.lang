@@ -4,7 +4,7 @@ MenuResourcePlanning=Resource planning
 DeleteResource=Delete resource
 ConfirmDeleteResourceElement=Confirm delete the resource for this element
 
-NoResourceInDatabase=Aucune resource en base de données.
+NoResourceInDatabase=No resource in database
 NoResourceLinked=No resource linked
 
 ResourcePageIndex=Resources list
@@ -15,3 +15,7 @@ RessourceLineSuccessfullyDeleted=Resource successfully deleted
 
 ShowResourcePlanning=Show resource planning
 PlanningOfAffectedResources=Planning of affected resources
+
+AddResource=Add a resource
+
+Mandatory=Mandatory

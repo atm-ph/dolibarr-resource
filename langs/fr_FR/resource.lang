@@ -15,3 +15,7 @@ RessourceLineSuccessfullyDeleted=Resource supprimée
 
 ShowResourcePlanning=Montrer le planning des ressources
 PlanningOfAffectedResources=Planning des ressources affectées aux évènements
+
+AddResource=Ajouter une resource
+
+Mandatory=Obligatoire
