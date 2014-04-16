@@ -80,7 +80,7 @@ elseif(is_array($fk_resource) and count($fk_resource) > 0)
 	$sql.= " AND r.resource_id IN (".$db->escape(implode($fk_resource,',')).")";
 }
 $sql.= ' AND a.fk_user_author = u.rowid';
-$sql.= ' AND a.entity IN ('.getEntity().')';
+$sql.= ' AND a.entity IN ('.getEntity('resource', true).')';
 if ($actioncode) $sql.=" AND ca.code='".$db->escape($actioncode)."'";
 if ($pid) $sql.=" AND a.fk_project=".$db->escape($pid);
 

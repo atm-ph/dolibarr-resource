@@ -141,7 +141,7 @@ class Resource extends CommonObject
 		$sql.= " t.fk_user_create,";
 		$sql.= " t.tms";
    		$sql.= ' FROM '.MAIN_DB_PREFIX .'element_resources as t ';
-   		//$sql.= " WHERE t.entity IN (".getEntity('resource').")";
+   		//$sql.= " WHERE t.entity IN (".getEntity('resource', true).")";
 
    		//Manage filter
    		if (!empty($filter)){
@@ -221,7 +221,7 @@ class Resource extends CommonObject
     	$sql.= " t.fk_user_create,";
     	$sql.= " t.tms";
     	$sql.= ' FROM '.MAIN_DB_PREFIX .'element_resources as t ';
-    	//$sql.= " WHERE t.entity IN (".getEntity('resource').")";
+    	//$sql.= " WHERE t.entity IN (".getEntity('resource', true).")";
 
     	//Manage filter
     	if (!empty($filter)){
