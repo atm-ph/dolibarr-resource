@@ -170,7 +170,7 @@ else
 
 
 
-	print_fiche_titre($langs->trans('ResourcesLinkedToElement'),'','resource_32@resource');
+	print_fiche_titre($langs->trans('ResourcesLinkedToElement'));
 
 
 	foreach ($object->available_resources as $modresources => $resources)
