@@ -1,17 +1,17 @@
 
-MenuResourceIndex=Resources
-MenuResourcePlanning=Resource planning
-DeleteResource=Delete resource
-ConfirmDeleteResourceElement=Confirm delete the resource for this element
+MenuResourceIndex=Ressources
+MenuResourcePlanning=Planning des Ressources
+DeleteResource=Effacer resource
+ConfirmDeleteResourceElement=Confirmer la suppression de la ressource pour cet élément
 
-NoResourceInDatabase=Aucune resource en base de données.
-NoResourceLinked=No resource linked
+NoResourceInDatabase=Aucune ressource en base de données.
+NoResourceLinked=Aucune ressource liée
 
-ResourcePageIndex=Resources list
+ResourcePageIndex=Liste des Ressources
 
-ResourcesLinkedToElement=Resources linked to element
-RessourceLineSuccessfullyUpdated=Resource successfully updated
-RessourceLineSuccessfullyDeleted=Resource successfully deleted
+ResourcesLinkedToElement=Ressources liées à l'élément
+RessourceLineSuccessfullyUpdated=Ressource mise à jour
+RessourceLineSuccessfullyDeleted=Resource supprimée
 
-ShowResourcePlanning=Show resource planning
+ShowResourcePlanning=Montrer le planning des ressources
 PlanningOfAffectedResources=Planning des ressources affectées aux évènements

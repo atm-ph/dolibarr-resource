@@ -94,7 +94,7 @@ class modResource extends DolibarrModules
 			// Set this to relative path of css if module has its own css file
 			//'css' => '/resource/css/resource.css.php',
 			// Set here all hooks context managed by module
-			'hooks' => array('actioncard','actioncommdao','element_resource')
+			'hooks' => array('actioncard','actioncommdao','projectcard','element_resource')
 			// Set here all workflow context managed by module
 			//'workflow' => array('order' => array('WORKFLOW_ORDER_AUTOCREATE_INVOICE'))
 		);
@@ -169,6 +169,7 @@ class modResource extends DolibarrModules
 
 		$this->tabs = array(
 			'action:+resources:Resources:resource@resource:$user->rights->resource->read:/resource/element_resource.php?element=action&element_id=__ID__',
+			'project:+resources:Resources:resource@resource:$user->rights->resource->read:/resource/element_resource.php?element=project&element_id=__ID__',
 			'thirdparty:+resources:Resources:resource@resource:$user->rights->resource->read:/resource/element_resource.php?element=societe&element_id=__ID__'
 		);
 
