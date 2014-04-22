@@ -61,7 +61,7 @@ class modResource extends DolibarrModules
 		// (where XXX is value of numeric property 'numero' of module)
 		$this->description = "Description of module Resource";
 		// Possible values for version are: 'development', 'experimental' or version
-		$this->version = '0.1';
+		$this->version = '0.1.1';
 		// Key used in llx_const table to save module status enabled/disabled
 		// (where MYMODULE is value of property name of module in uppercase)
 		$this->const_name = 'MAIN_MODULE_' . strtoupper($this->name);
@@ -80,7 +80,7 @@ class modResource extends DolibarrModules
 		// for specific css file (eg: /resource/css/resource.css.php)
 		$this->module_parts = array(
 			// Set this to 1 if module has its own trigger directory
-			//'triggers' => 1,
+			'triggers' => 1,
 			// Set this to 1 if module has its own login method directory
 			//'login' => 0,
 			// Set this to 1 if module has its own substitution function file
