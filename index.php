@@ -89,7 +89,7 @@ llxHeader('',$pagetitle,'');
 
 $form=new Form($db);
 
-print_fiche_titre($pagetitle,'','resource_32.png@resource');
+print_fiche_titre($pagetitle);
 
 	// Confirmation suppression resource line
 	if ($action == 'delete_resource')

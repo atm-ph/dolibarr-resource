@@ -1,5 +1,6 @@
 <?php
 /* Copyright (C) 2013	Jean-François Ferry	<jfefe@aternatik.fr>
+ * Copyright (C) 2014   Raphaël Doursenaud  <rdoursenaud@gpcsolutions.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -69,7 +70,6 @@ class Resource extends CommonObject
      */
     function fetch($id)
     {
-    	global $langs;
     	$sql = "SELECT";
     	$sql.= " t.rowid,";
    		$sql.= " t.resource_id,";
@@ -130,7 +130,6 @@ class Resource extends CommonObject
      */
     function fetch_all($sortorder, $sortfield, $limit, $offset, $filter='')
     {
-   		global $conf;
    		$sql="SELECT ";
    		$sql.= " t.rowid,";
    		$sql.= " t.resource_id,";
@@ -211,7 +210,6 @@ class Resource extends CommonObject
      */
     function fetch_all_used($sortorder="ASC",$sortfield="t.rowid",$limit, $offset, $filter='')
     {
-    	global $conf;
     	$sql="SELECT ";
     	$sql.= " t.rowid,";
     	$sql.= " t.resource_id,";
@@ -418,6 +416,11 @@ class Resource extends CommonObject
     		$module = 'agenda';
     	}
 
+	    if($element_type == 'project') {
+		    $module = 'projet';
+		    $classpath = 'projet/class';
+	    }
+
 
     	$element_properties = array(
     		'module' => $module,
@@ -434,9 +437,11 @@ class Resource extends CommonObject
      * Fetch an object with element_type and his id
      * Inclusion classes is automatic
      *
-     *
+     * @param int $element_id       The element's numeric ID
+     * @param string $element_type  The element's type
+     * @return CommonObject|int     The requested object or 0 on failure
      */
-    function fetchObjectByElement($element_id,$element_type) {
+	function fetchObjectByElement($element_id,$element_type) {
 
 		global $conf;
 
@@ -444,7 +449,8 @@ class Resource extends CommonObject
 
 		if (is_array($element_prop) && $conf->$element_prop['module']->enabled)
 		{
-			dol_include_once('/'.$element_prop['classpath'].'/'.$element_prop['classfile'].'.class.php');
+			$classpath = '/'.$element_prop['classpath'].'/'.$element_prop['classfile'].'.class.php';
+			dol_include_once($classpath);
 
 			$objectstat = new $element_prop['classname']($this->db);
 			$ret = $objectstat->fetch($element_id);
@@ -463,7 +469,7 @@ class Resource extends CommonObject
      *	@param		string	$element_type		Element type
      *	@param		int		$resource_id		Resource id
      *	@param		string	$resource_type		Resource type
-     *	@param		array	$resource   		Resources linked with element
+     *	@param		array	$resource   		Resources linked with element                                                             ct
      *	@return		int					<=0 if KO, >0 if OK
      */
     function add_element_resource($element_id,$element_type,$resource_id,$resource_element,$busy=0,$mandatory=0)
@@ -545,7 +551,7 @@ class Resource extends CommonObject
     {
     	$resources = $this->getElementResources($element,$element_id);
     	$i=0;
-    	foreach($resources as $nb => $resource)
+    	foreach($resources as $resource)
     	{
     		$this->lines[$i] = $this->fetchObjectByElement($resource['resource_id'],$resource['resource_type']);
     		$i++;
@@ -582,7 +588,8 @@ class Resource extends CommonObject
     			$interface=new Interfaces($this->db);
     			$result=$interface->run_triggers(strtoupper($element).'_DELETE_RESOURCE',$this,$user,$langs,$conf);
     			if ($result < 0) {
-    				$error++; $this->errors=$interface->errors;
+    				// FIXME: unused variable
+				    $error++; $this->errors=$interface->errors;
     			}
     			// End call triggers
     		}

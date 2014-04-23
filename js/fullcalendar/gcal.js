@@ -1,6 +1,6 @@
 /*!
  * FullCalendar v1.6.4 Google Calendar Plugin
- * Docs & License: http://arshaw.com/fullcalendar/
+ * Docs & License:
  * (c) 2013 Adam Shaw
  */
  

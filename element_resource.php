@@ -1,6 +1,7 @@
 <?php
 /* Module to manage locations, buildings, floors and rooms into Dolibarr ERP/CRM
  * Copyright (C) 2013	Jean-François Ferry	<jfefe@aternatik.fr>
+ * Copyright (C) 2014   Raphaël Doursenaud  <rdoursenaud@gpcsolutions.fr>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -167,10 +168,41 @@ else
 			print '</div>';
 		}
 	}
+	/*
+	 * Specific to project module
+	 */
+	if($element_id && $element == 'project')
+	{
+		require_once DOL_DOCUMENT_ROOT.'/core/lib/project.lib.php';
+
+		$act = $object->fetchObjectByElement($element_id,$element);
+		if(is_object($act)) {
+
+			$head=project_prepare_head($act);
+
+			dol_fiche_head($head, 'resources', $langs->trans("Project"),0,'project');
+
+			// Affichage fiche action en mode visu
+			print '<table class="border" width="100%">';
+
+			$linkback = '<a href="'.DOL_URL_ROOT.'/projet/liste.php">'.$langs->trans("BackToList").'</a>';
+
+			// Ref
+			print '<tr><td width="30%">'.$langs->trans("Ref").'</td><td colspan="3">';
+			print $form->showrefnav($act, 'id', $linkback, ($user->societe_id?0:1), 'id', 'ref', '');
+			print '</td></tr>';
+
+			// Title
+			print '<tr><td>'.$langs->trans("Title").'</td><td colspan="3">'.$act->title.'</td></tr>';
+
+			print '</table>';
+
+			print '</div>';
+		}
+	}
 
 
-
-	print_fiche_titre($langs->trans('ResourcesLinkedToElement'),'','resource_32@resource');
+	print_fiche_titre($langs->trans('ResourcesLinkedToElement'));
 
 
 	foreach ($object->available_resources as $modresources => $resources)

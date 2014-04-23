@@ -73,7 +73,7 @@ class modResource extends DolibarrModules
 		// use this->picto='pictovalue'
 		// If file is in module/img directory under name object_pictovalue.png
 		// use this->picto='pictovalue@module'
-		$this->picto = 'resource@resource'; // mypicto@resource
+		//$this->picto = 'resource@resource'; // mypicto@resource
 		// Defined all module parts (triggers, login, substitutions, menus, css, etc...)
 		// for default path (eg: /resource/core/xxxxx) (0=disable, 1=enable)
 		// for specific path of parts (eg: /resource/core/modules/barcode)
@@ -92,9 +92,9 @@ class modResource extends DolibarrModules
 			// Set this to 1 if module has its own models directory
 			//'models' => 0,
 			// Set this to relative path of css if module has its own css file
-			'css' => '/resource/css/resource.css.php',
+			//'css' => '/resource/css/resource.css.php',
 			// Set here all hooks context managed by module
-			'hooks' => array('actioncard','actioncommdao','element_resource')
+			'hooks' => array('actioncard','actioncommdao','projectcard','element_resource')
 			// Set here all workflow context managed by module
 			//'workflow' => array('order' => array('WORKFLOW_ORDER_AUTOCREATE_INVOICE'))
 		);
@@ -105,7 +105,7 @@ class modResource extends DolibarrModules
 
 		// Config pages. Put here list of php pages
 		// stored into resource/admin directory, used to setup module.
-		$this->config_page_url = array("admin_resource.php@resource");
+		//$this->config_page_url = array("admin_resource.php@resource");
 
 		// Dependencies
 		// List of modules id that must be enabled if this module is enabled
@@ -169,6 +169,7 @@ class modResource extends DolibarrModules
 
 		$this->tabs = array(
 			'action:+resources:Resources:resource@resource:$user->rights->resource->read:/resource/element_resource.php?element=action&element_id=__ID__',
+			'project:+resources:Resources:resource@resource:$user->rights->resource->read:/resource/element_resource.php?element=project&element_id=__ID__',
 			'thirdparty:+resources:Resources:resource@resource:$user->rights->resource->read:/resource/element_resource.php?element=societe&element_id=__ID__'
 		);
 

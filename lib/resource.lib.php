@@ -33,8 +33,6 @@
 */
 function llxHeaderResource($head, $title, $disablejs, $disablehead, $arrayofjs, $arrayofcss)
 {
-	global $user, $conf, $langs;
-
 	top_htmlhead($head, $title, $disablejs, $disablehead, $arrayofjs, $arrayofcss);
 	print '<body style="margin: 20px;">'."\n";
 }
