@@ -29,7 +29,6 @@ dol_include_once('/resource/core/modules/modResource.class.php');
  */
 class InterfaceTaskEvents
 {
-
 	/**
 	 * Database object
 	 *
@@ -61,6 +60,11 @@ class InterfaceTaskEvents
 	 * @var string
 	 */
 	public $picto;
+
+	/**
+	 * @var Task
+	 */
+	private $_task;
 
 	/**
 	 * Constructor
@@ -139,13 +143,16 @@ class InterfaceTaskEvents
 		switch ($action) {
 			case 'TASK_CREATE':
 				$this->logTrigger($action, $object->id);
-				return $this->createEvent($object, $user);
+				$this->_task = $object;
+				return $this->createEvent($user);
 			case 'TASK_MODIFY':
 				$this->logTrigger($action, $object->id);
-				return $this->modifyEvent($object, $user);
+				$this->_task = $object;
+				return $this->modifyEvent($user);
 			case 'TASK_DELETE':
 				$this->logTrigger($action, $object->id);
-				return $this->deleteEvent($object, $user);
+				$this->_task = $object;
+				return $this->deleteEvent();
 			default:
 				return 0;
 		}
@@ -167,63 +174,58 @@ class InterfaceTaskEvents
 	/**
 	 * Creates a new event from the task
 	 *
-	 * @param Task $task The related task
 	 * @param User $user The related user
 	 * @return int
 	 */
-	protected function createEvent($task, $user) {
+	protected function createEvent($user) {
 		require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
 		$event = new ActionComm($this->db);
 		$event->type_code = 'AC_OTH'; 	// FIXME: Deprecated but still needed parameter, oh well…
 		$event->code = 'AC_TASKEVENT_CREATE';
 		$event->elementtype = 'task';
-		$event->fk_element = $task->id;
-		$event->fk_project = $task->fk_project;
-		$event->label = $task->label;
-		$event->datep = $task->date_start;
-		$event->datef = $task->date_end;
-		$event->percentage = $task->progress;
+		$event->fk_element = $this->_task->id;
+		$event->fk_project = $this->_task->fk_project;
+		$event->label = $this->_task->label;
+		$event->datep = $this->_task->date_start;
+		$event->datef = $this->_task->date_end;
+		$event->percentage = $this->_task->progress;
 		return $event->add($user);
 	}
 
 	/**
 	 * Modifies/updates the event related to the task
 	 *
-	 * @param Task $task The related task
 	 * @param User $user The related user
 	 * @return int
 	 */
-	protected function modifyEvent($task, $user) {
-		$event = $this->getEvent($task);
+	protected function modifyEvent($user) {
+		$event = $this->getEvent();
 		$event->code = 'AC_TASKEVENT_MODIFY';
-		$event->fk_project = $task->fk_project;
-		$event->label = $task->label;
-		$event->datep = $task->date_start;
-		$event->datef = $task->date_end;
-		$event->percentage = $task->progress;
+		$event->fk_project = $this->_task->fk_project;
+		$event->label = $this->_task->label;
+		$event->datep = $this->_task->date_start;
+		$event->datef = $this->_task->date_end;
+		$event->percentage = $this->_task->progress;
 		return $event->update($user);
 	}
 
 	/**
 	 * Deletes the event related to the task
 	 *
-	 * @param Task $task The related task
-	 * @param User $user The related user
 	 * @return int
 	 */
-	protected function deleteEvent($task, $user) {
-		$event = $this->getEvent($task);
-		return $event->delete($user);
+	protected function deleteEvent() {
+		$event = $this->getEvent();
+		return $event->delete();
 	}
 
 	/**
 	 * Get the event related to the task
 	 *
-	 * @param Task $task Task
 	 * @return ActionComm
 	 */
-	protected function getEvent($task) {
-		$events = ActionComm::getActions($this->db, 0, $task->id, 'task');
+	protected function getEvent() {
+		$events = ActionComm::getActions($this->db, 0, $this->_task->id, 'task');
 		if (count($events) !== 1) {
 			// TODO: Error, there should not be more than one event linked to a task
 			dol_syslog(
