@@ -110,15 +110,12 @@ class InterfaceTaskEvents
 			case 'TASK_CREATE':
 				$this->logTrigger($action, $object->id);
 				return $this->createEvent($object, $user);
-				break;
 			case 'TASK_MODIFY':
 				$this->logTrigger($action, $object->id);
 				return $this->modifyEvent($object, $user);
-				break;
 			case 'TASK_DELETE':
 				$this->logTrigger($action, $object->id);
 				return $this->deleteEvent($object, $user);
-				break;
 			default:
 				return 0;
 		}
