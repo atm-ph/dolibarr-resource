@@ -111,6 +111,14 @@ class InterfaceTaskEvents
 				$this->logTrigger($action, $object->id);
 				return $this->createEvent($object, $user);
 				break;
+			case 'TASK_MODIFY':
+				$this->logTrigger($action, $object->id);
+				return $this->modifyEvent($object, $user);
+				break;
+			case 'TASK_DELETE':
+				$this->logTrigger($action, $object->id);
+				return $this->deleteEvent($object, $user);
+				break;
 			default:
 				return 0;
 		}
@@ -141,13 +149,61 @@ class InterfaceTaskEvents
 		$event = new ActionComm($this->db);
 		$event->type_code = 'AC_OTH'; 	// FIXME: Deprecated but still needed parameter, oh well…
 		$event->code = 'AC_TASKEVENT_CREATE';
+		$event->elementtype = 'task';
+		$event->fk_element = $task->id;
+		$event->fk_project = $task->fk_project;
 		$event->label = $task->label;
 		$event->datep = $task->date_start;
 		$event->datef = $task->date_end;
 		$event->percentage = $task->progress;
-		$event->fk_element = $task->id;
-		$event->elementtype = 'task';
-		$event->fk_project = $task->fk_project;
 		return $event->add($user);
+	}
+
+	/**
+	 * Modifies/updates the event related to the task
+	 *
+	 * @param Task $task The related task
+	 * @param User $user The related user
+	 * @return int
+	 */
+	protected function modifyEvent($task, $user) {
+		$event = $this->getEvent($task);
+		$event->code = 'AC_TASKEVENT_MODIFY';
+		$event->fk_project = $task->fk_project;
+		$event->label = $task->label;
+		$event->datep = $task->date_start;
+		$event->datef = $task->date_end;
+		$event->percentage = $task->progress;
+		return $event->update($user);
+	}
+
+	/**
+	 * Deletes the event related to the task
+	 *
+	 * @param Task $task The related task
+	 * @param User $user The related user
+	 * @return int
+	 */
+	protected function deleteEvent($task, $user) {
+		$event = $this->getEvent($task);
+		return $event->delete($user);
+	}
+
+	/**
+	 * Get the event related to the task
+	 *
+	 * @param Task $task Task
+	 * @return ActionComm
+	 */
+	protected function getEvent($task) {
+		$events = ActionComm::getActions($this->db, 0, $task->id, 'task');
+		if (count($events) !== 1) {
+			// TODO: Error, there should not be more than one event linked to a task
+			dol_syslog(
+				"More than one event found, using only first.",
+				LOG_ERR
+			);
+		}
+		return $events[0];
 	}
 }
