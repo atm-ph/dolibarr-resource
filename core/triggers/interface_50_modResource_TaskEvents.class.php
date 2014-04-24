@@ -30,7 +30,37 @@ dol_include_once('/resource/core/modules/modResource.class.php');
 class InterfaceTaskEvents
 {
 
+	/**
+	 * Database object
+	 *
+	 * @var DoliDB
+	 */
 	private $db;
+
+	/**
+	 * @var string
+	 */
+	public $name;
+
+	/**
+	 * @var string
+	 */
+	public $family;
+
+	/**
+	 * @var string
+	 */
+	public $description;
+
+	/**
+	 * @var string
+	 */
+	public $version;
+
+	/**
+	 * @var string
+	 */
+	public $picto;
 
 	/**
 	 * Constructor
