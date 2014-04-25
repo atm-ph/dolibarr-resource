@@ -18,7 +18,7 @@
  */
 
 /**
- *  \file       resource/resourc_planning
+ *  \file       resource/resource_planning
  *  \ingroup    resource
  *  \brief      Resource planning view
  */
