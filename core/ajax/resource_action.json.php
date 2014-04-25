@@ -1,6 +1,7 @@
 <?php
-/* Copyright (C) 2007-2010 Laurent Destailleur  <eldy@users.sourceforge.net>
- * Copyright (C) 2013	   Jean-François Ferry		<jfefe@aternatik.fr>
+/* Copyright (C) 2007-2010  Laurent Destailleur <eldy@users.sourceforge.net>
+ * Copyright (C) 2013       Jean-François Ferry <jfefe@aternatik.fr>
+ * Copyright (C) 2014       Raphaël Doursenaud  <rdoursenaud@gpcsolutions.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -51,6 +52,7 @@ $fk_resource	= GETPOST('fk_resource');
 // Get event in an array
 $eventarray=array();
 
+// FIXME: only select events with an affected resource
 $sql = 'SELECT a.id, a.label,';
 $sql.= ' a.datep,';
 $sql.= ' a.datep2,';
@@ -62,7 +64,7 @@ $sql.= ' a.fk_user_author,a.fk_user_action,a.fk_user_done,';
 $sql.= ' a.priority, a.fulldayevent, a.location,';
 $sql.= ' a.fk_soc, a.fk_contact,';
 $sql.= ' ca.code';
-if( is_array ($fk_resource) || $fk_resource > 0 ) {
+if(is_array($fk_resource) || $fk_resource > 0) {
 	$sql.= ', r.resource_id';
 }
 $sql.= ' FROM ('.MAIN_DB_PREFIX.'c_actioncomm as ca,';
@@ -109,13 +111,13 @@ if ($resql)
     while ($i < $num)
     {
         $obj = $db->fetch_object($resql);
-        $transcode=
+        //$transcode=
         // Create a new object action
         $event=new ActionComm($db);
         $resourcestat = new Resource($db);
 
         $resources = $resourcestat->getElementResources($event->element,$obj->id);
-        if ( is_array($resources) && count ( $resources ) > 0 )
+        if(is_array($resources) && count($resources) > 0)
         {
 	        $i=0;
 	        foreach($resources as $nb => $resource)
@@ -144,8 +146,6 @@ if ($resql)
         $event->societe->id=$obj->fk_soc;
         $event->contact->id=$obj->fk_contact;
 
-
-
         $eventarray[]=$event;
 
         $i++;
@@ -158,17 +158,18 @@ else
 }
 
 //var_dump($eventarray);
-foreach ($eventarray as $day => $event) {
+foreach($eventarray as $day => $event) {
 
 	$description = $event->note;
-	if ( is_array($event->resources) && count ( $event->resources ) > 0 )
+	$event_resources = array();
+	if(is_array($event->resources) && count($event->resources) > 0)
 	{
 		$description.="<br /><strong>".$langs->trans('Ressources')."</strong><br />";
 		foreach($event->resources as $resource_event) {
 			$description.="<br /><strong>".$langs->trans('Ressources')."</strong><br />";
 			$description.= $resource_event->getNomUrl();
+			$event_resources[] = $resource_event->id;
 		}
-
 	}
 
 	$colors = array ('AC_WORKSHOP' => '#95DC16', 'AC_CONFERENC'=> '#F2B579');
@@ -184,14 +185,37 @@ foreach ($eventarray as $day => $event) {
 			'allDay' => $event->fulldayevent?true:false,
 			'url' => dol_buildpath("/comm/action/fiche.php",1).'?id='. $event->id,
 			// TODO : associer une couleur au thme et la reprendre ici
-			'backgroundColor' => $colors[$event->code]
+			'backgroundColor' => $colors[$event->code],
+			'resource' => $event_resources
 			//'color' => 'white'
 		);
 }
 
 //var_dump($event_json);
-echo json_encode($event_json);
+//echo json_encode($event_json);
 
+// Resources list
+// FIXME: limit shouldn't be needed
+$resourcestat = new Resource($db);
+$resource_json = array();
+$resourcestat->fetch_all_used('ASC', 't.rowid', 1000000,0);
+foreach($resourcestat->lines as $resource) {
+		$resource_json[] = array(
+			'name' => $resource->objresource->ref,
+			'id' => $resource->objresource->id
+		);
+}
+
+header('Content-Type: application/json');
+switch($action) {
+	case 'resource':
+		echo json_encode($resource_json);
+		break;
+	case 'events':
+		echo json_encode($event_json);
+		break;
+
+}
 
 $db->close();
 ?>

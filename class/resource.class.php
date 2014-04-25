@@ -210,6 +210,7 @@ class Resource extends CommonObject
      */
     function fetch_all_used($sortorder="ASC",$sortfield="t.rowid",$limit, $offset, $filter='')
     {
+	//FIXME: limit and offset shouldn't be required
     	$sql="SELECT ";
     	$sql.= " t.rowid,";
     	$sql.= " t.resource_id,";
