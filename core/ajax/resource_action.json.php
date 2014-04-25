@@ -164,10 +164,10 @@ foreach($eventarray as $day => $event) {
 	$event_resources = array();
 	if(is_array($event->resources) && count($event->resources) > 0)
 	{
-		$description.="<br /><strong>".$langs->trans('Ressources')."</strong><br />";
+		$description.="<br><strong>".$langs->trans('Ressources')."</strong><br>";
 		foreach($event->resources as $resource_event) {
-			$description.="<br /><strong>".$langs->trans('Ressources')."</strong><br />";
 			$description.= $resource_event->getNomUrl();
+			$description.= '<br>';
 			$event_resources[] = $resource_event->id;
 		}
 	}

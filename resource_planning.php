@@ -40,11 +40,13 @@ $langs->load("other");
 * VIEW
 ****************************************************/
 $morecss=array(
-	"/resource/js/fullcalendar/fullcalendar.css"
+	"/resource/js/fullcalendar/fullcalendar.css",
+	"/resource/js/jquery.qtip.css"
 );
 
 $morejs=array(
-	"/resource/js/fullcalendar/fullcalendar.js"
+	"/resource/js/fullcalendar/fullcalendar.js",
+	"/resource/js/jquery.qtip.js"
 );
 
 $title = $langs->trans('ResourcePlaning');
@@ -73,8 +75,22 @@ jQuery(document).ready(function() {
 			right: "resourceDay,resourceWeek,resourceNextWeeks,resourceMonth"
 		},
 		defaultView: "resourceWeek",
-		resources: "'.dol_buildpath('/resource/core/ajax/resource_action.json.php?action=resource',1).'",
-		events: "'.dol_buildpath('/resource/core/ajax/resource_action.json.php?action=events',1).'",
+		resources: "' . dol_buildpath('/resource/core/ajax/resource_action.json.php?action=resource', 1) . '",
+		events: "' . dol_buildpath('/resource/core/ajax/resource_action.json.php?action=events', 1) . '",
+		eventRender: function(event, element) {
+			element.qtip({
+				content: {
+					title:event.title + " (" + event.action_code + ")" ,
+					text: event.description
+				},
+				position: {
+					at: \'bottomLeft\'
+				},
+				show: {
+					event: \'click mouseenter\'
+				}
+			});
+		}
 	});
 });
 </script>';
