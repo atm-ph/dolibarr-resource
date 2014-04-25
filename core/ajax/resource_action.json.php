@@ -157,7 +157,6 @@ else
     dol_print_error($db);
 }
 
-//var_dump($eventarray);
 foreach($eventarray as $day => $event) {
 
 	$description = $event->note;
@@ -190,9 +189,6 @@ foreach($eventarray as $day => $event) {
 			//'color' => 'white'
 		);
 }
-
-//var_dump($event_json);
-//echo json_encode($event_json);
 
 // Resources list
 // FIXME: limit shouldn't be needed
