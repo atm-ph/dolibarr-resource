@@ -225,6 +225,7 @@ class InterfaceTaskEvents
 	 * @return ActionComm
 	 */
 	protected function getEvent() {
+		require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
 		$events = ActionComm::getActions($this->db, 0, $this->_task->id, 'task');
 		if (count($events) !== 1) {
 			// TODO: Error, there should not be more than one event linked to a task
