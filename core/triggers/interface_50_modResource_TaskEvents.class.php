@@ -132,7 +132,7 @@ class InterfaceTaskEvents
 	 * is inside directory core/triggers
 	 *
 	 * @param        string $action Event action code
-	 * @param        Object $object Object
+	 * @param        CommonObject $object Object
 	 * @param        User $user Object user
 	 * @param        Translate $langs Object langs
 	 * @param        conf $conf Object conf
@@ -153,6 +153,18 @@ class InterfaceTaskEvents
 				$this->logTrigger($action, $object->id);
 				$this->_task = $object;
 				return $this->deleteEvent();
+			case 'ACTION_MODIFY':
+				$this->logTrigger($action, $object->id);
+				if($this->isEventTask($object)) {
+					return $this->modifyTask($object, $user);
+				}
+				break;
+			case 'ACTION_DELETE':
+				$this->logTrigger($action, $object->id);
+				if($this->isEventTask($object)) {
+					return $this->deleteTask($object, $user);
+				}
+				break;
 			default:
 				return 0;
 		}
@@ -182,13 +194,14 @@ class InterfaceTaskEvents
 		$event = new ActionComm($this->db);
 		$event->type_code = 'AC_OTH'; 	// FIXME: Deprecated but still needed parameter, oh well…
 		$event->code = 'AC_TASKEVENT_CREATE';
-		$event->elementtype = 'task';
+		$event->elementtype = $this->_task->element;
 		$event->fk_element = $this->_task->id;
 		$event->fk_project = $this->_task->fk_project;
 		$event->label = $this->_task->label;
 		$event->datep = $this->_task->date_start;
 		$event->datef = $this->_task->date_end;
 		$event->percentage = $this->_task->progress;
+		$event->note = $this->_task->description;
 		return $event->add($user);
 	}
 
@@ -206,7 +219,8 @@ class InterfaceTaskEvents
 		$event->datep = $this->_task->date_start;
 		$event->datef = $this->_task->date_end;
 		$event->percentage = $this->_task->progress;
-		return $event->update($user);
+		$event->note = $this->_task->description;
+		return $event->update($user, true);
 	}
 
 	/**
@@ -225,7 +239,10 @@ class InterfaceTaskEvents
 	 * @return ActionComm
 	 */
 	protected function getEvent() {
-		$events = ActionComm::getActions($this->db, 0, $this->_task->id, 'task');
+		require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+		$events = ActionComm::getActions($this->db, 0, $this->_task->id, $this->_task->element);
+		// Only keep event/task events
+		$events = array_filter($events, "self::isEventTask");
 		if (count($events) !== 1) {
 			// TODO: Error, there should not be more than one event linked to a task
 			dol_syslog(
@@ -233,6 +250,64 @@ class InterfaceTaskEvents
 				LOG_ERR
 			);
 		}
-		return $events[0];
+		// Return ony the first event
+		reset($events);
+		return $events[key($events)];
+	}
+
+	/**
+	 * Modifies/updates the task related to the event
+	 *
+	 * @param ActionComm $event The event
+	 * @param User $user The related user
+	 * @return int
+	 */
+	protected function modifyTask($event, $user) {
+		$this->getTask($event);
+		$this->_task->label = $event->label;
+		$this->_task->date_start = $event->datep;
+		$this->_task->date_end = $event->datef;
+		$this->_task->progress = $event->percentage;
+		$this->_task->description = $event->note;
+		return $this->_task->update($user, true);
+	}
+
+	/**
+	 * Deletes the task related to the event
+	 *
+	 * @param ActionComm $event The event
+	 * @param User $user The related user
+	 * @return int
+	 */
+	protected function deleteTask($event, $user) {
+		$this->getTask($event);
+		return $this->_task->delete($user, true);
+	}
+
+	/**
+	 * Check if event is related to a task
+	 *
+	 * @param CommonObject $object The object to check
+	 * @return bool
+	 */
+	protected function isEventTask($object) {
+		// The passed object is partial, let's get it in full
+		$object->fetch($object->id);
+		if(strstr($object->code, 'AC_TASKEVENT') && $object->elementtype==='project_task') {
+			return true;
+		}
+		return false;
+	}
+
+	/**
+	 * Get the task related to the event
+	 *
+	 * @param ActionComm $event The event
+	 * @return void
+	 */
+	protected function getTask($event) {
+		require_once DOL_DOCUMENT_ROOT.'/projet/class/task.class.php';
+		$this->_task = new Task($this->db);
+		$this->_task->fetch($event->fk_element);
 	}
 }
