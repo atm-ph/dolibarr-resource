@@ -45,28 +45,13 @@ $morecss=array(
 );
 
 $morejs=array(
-	"/resource/js/fullcalendar/fullcalendar.js",
-	"/resource/js/jquery.qtip.js"
+	"/resource/js/fullcalendar/fullcalendar.min.js",
+	"/resource/js/jquery.qtip.min.js"
 );
 
 $title = $langs->trans('ResourcePlaning');
 
-llxHeader('', $title, '', '', 0, 0, $morejs, $morecss);
-
-print '<div class="fichecenter">';
-
-print_fiche_titre($langs->trans('PlanningOfAffectedResources'));
-
-print '<div id="calendar"></div>';
-
-print '</div>';
-
-/*
- * Fullcalendar declaration
- * Keep at the bottom of the page for asynchronous loading
- */
-// FIXME: missing translation
-echo '<script type="text/javascript" language="javascript">
+$fullcalendar = '<script type="text/javascript" language="javascript">
 jQuery(document).ready(function() {
 	$("#calendar").fullCalendar({
 		header: {
@@ -80,20 +65,21 @@ jQuery(document).ready(function() {
 		eventRender: function(event, element) {
 			element.qtip({
 				content: {
-					title:event.title + " (" + event.action_code + ")" ,
+					title: event.title + " (" + event.action_code + ")" ,
 					text: event.description
 				},
 				position: {
-					at: \'bottomLeft\'
-				},
-				show: {
-					event: \'click mouseenter\'
+					at: "bottomLeft"
 				}
 			});
 		}
 	});
 });
 </script>';
+
+llxHeader($fullcalendar, $title, '', '', 0, 0, $morejs, $morecss);
+
+print '<div id="calendar"></div>';
 
 // Page end
 llxFooter();
