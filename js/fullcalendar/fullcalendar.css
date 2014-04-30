@@ -1,5 +1,5 @@
 /*!
- * FullCalendar-Resourceviews v1.6.1.6 Stylesheet
+ * FullCalendar-Resourceviews v1.6.4.1 Stylesheet
  * Docs & License: http://arshaw.com/fullcalendar/, http://tux.fi/~jarnok/fullcalendar-resourceviews
  * (c) 2013 Adam Shaw, 2013 Jarno Kurlin (Resource Views)
  */
@@ -102,11 +102,12 @@ html .fc,
 	
 .fc-content {
 	clear: both;
+	zoom: 1; /* for IE7, gives accurate coordinates for [un]freezeContentHeight */
 	}
 	
 .fc-view {
-	width: 100%; /* needed for view switching (when view is absolute) */
-	overflow: hidden;
+	width: 100%;
+	overflow: visible;
 	}
 	
 	
@@ -250,6 +251,15 @@ html .fc,
 
 /* Global Event Styles
 ------------------------------------------------------------------------*/
+
+.fc-event-container > * {
+	z-index: 8;
+	}
+
+.fc-event-container > .ui-draggable-dragging,
+.fc-event-container > .ui-resizable-resizing {
+	z-index: 9;
+	}
 	 
 .fc-event {
 	border: 1px solid #3a87ad; /* default BORDER color */
@@ -575,5 +585,25 @@ table.fc-border-separate {
 .fc-agenda .ui-resizable-resizing { /* TODO: better selector */
 	_overflow: hidden;
 	}
+	
+	
+
+/* Resource month, Resource week, Resource day
+------------------------------------------------------------------------*/
+
+td.fc-resourceName {
+	border-left: 1px solid #ddd;
+	border-top: 1px solid #ddd;
+	padding: 0px 5px 0px 5px;
+	white-space: nowrap;
+	font-size: 14px;
+	font-weight:bold;
+}
+tr.fc-last td.fc-resourceName {
+	border-bottom: 1px solid #ddd;	
+}
+th.fc-resourceName {
+	border-bottom: 1px solid #ddd;
+}
 	
 	
