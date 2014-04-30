@@ -128,7 +128,7 @@ class Resource extends CommonObject
 	 *  @param	array		$filter    	  filter output
 	 *  @return int          	<0 if KO, >0 if OK
      */
-    function fetch_all($sortorder, $sortfield, $limit, $offset, $filter='')
+    function fetch_all($sortorder, $sortfield, $limit, $offset, $filter=array())
     {
    		$sql="SELECT ";
    		$sql.= " t.rowid,";
@@ -208,7 +208,7 @@ class Resource extends CommonObject
      *  @param	array		$filter    	  filter output
      *  @return int          	<0 if KO, >0 if OK
      */
-    function fetch_all_used($sortorder="ASC",$sortfield="t.rowid",$limit, $offset, $filter='')
+    function fetch_all_used($sortorder="ASC",$sortfield="t.rowid",$limit, $offset, $filter=array())
     {
 	//FIXME: limit and offset shouldn't be required
     	$sql="SELECT ";
@@ -515,6 +515,7 @@ class Resource extends CommonObject
      */
     function getElementResources($element,$element_id,$resource_type='')
     {
+	    $resources = array();
 
 	    // Links beetween objects are stored in this table
 	    $sql = 'SELECT rowid, resource_id, resource_type, busy, mandatory';

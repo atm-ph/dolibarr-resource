@@ -79,7 +79,7 @@ if(!is_array($fk_resource) && $fk_resource > 0) {
 }
 elseif(is_array($fk_resource) and count($fk_resource) > 0)
 {
-	$sql.= " AND r.resource_id IN (".$db->escape(implode($fk_resource,',')).")";
+	$sql.= " AND r.resource_id IN (".$db->escape(implode(',',$fk_resource)).")";
 }
 $sql.= ' AND a.fk_user_author = u.rowid';
 $sql.= ' AND a.entity IN ('.getEntity('resource', true).')';
