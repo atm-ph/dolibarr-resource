@@ -157,7 +157,7 @@ else
     dol_print_error($db);
 }
 
-$events_json = array();
+$event_json = array();
 foreach($eventarray as $day => $event) {
 
 	$description = $event->note;
