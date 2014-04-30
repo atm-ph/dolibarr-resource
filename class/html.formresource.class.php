@@ -74,7 +74,6 @@ class FormResource
     {
     	global $conf,$langs;
 
-    	$out='';
     	$outarray=array();
 
     	$resourcestat = new Resource($this->db);
