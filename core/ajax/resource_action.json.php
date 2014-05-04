@@ -74,6 +74,13 @@ if(is_array($fk_resource) || $fk_resource > 0 ) {
 	$sql .= ' LEFT JOIN '.MAIN_DB_PREFIX.'element_resources as r ON a.id = r.element_id ';
 }
 $sql.= ' WHERE a.fk_action = ca.id';
+// FILTER by date
+if (!empty($start)) {
+	$sql .= ' AND a.datep2 > ' . $db->idate($start);
+}
+if (!empty($end)) {
+	$sql .= ' AND a.datep < ' . $db->idate($end);
+}
 if(!is_array($fk_resource) && $fk_resource > 0) {
 	$sql.= " AND r.resource_id = '".$db->escape($fk_resource)."'";
 }
