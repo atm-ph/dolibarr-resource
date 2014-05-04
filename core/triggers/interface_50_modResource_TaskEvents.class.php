@@ -145,6 +145,7 @@ class InterfaceTaskEvents
 				$this->logTrigger($action, $object->id);
 				$this->_task = $object;
 				return $this->createEvent($user);
+				// TODO: add project resources to the event
 			case 'TASK_MODIFY':
 				$this->logTrigger($action, $object->id);
 				$this->_task = $object;
@@ -165,6 +166,24 @@ class InterfaceTaskEvents
 					return $this->deleteTask($object, $user);
 				}
 				break;
+			case 'PROJECT_RESOURCE_ADD':
+				$this->logTrigger($action, $object->id);
+				// TODO: add resource to all project tasks
+			case 'PROJECT_RESOURCE_MODIFY':
+				$this->logTrigger($action, $object->id);
+				// TODO: modify resources on all project tasks
+			case 'PROJECT_RESOURCE_DELETE':
+				$this->logTrigger($action, $object->id);
+				// TODO: delete resource from all project tasks
+			case 'ACTION_RESOURCE_ADD':
+				$this->logTrigger($action, $object->id);
+				// TODO: prevent adding resources to eventtasks
+			case 'ACTION_RESOURCE_MODIFY':
+				$this->logTrigger($action, $object->id);
+				// TODO: prevent modifying resources on eventtasks
+			case 'ACTION_RESOURCE_DELETE':
+				$this->logTrigger($action, $object->id);
+				// TODO: don't allow deleting resources on eventtasks
 			default:
 				return 0;
 		}
