@@ -65,10 +65,11 @@ class Resource extends CommonObject
 
     /**
      *    Load object in memory from database
-     *    @param      id          id object
-     *    @return     int         <0 if KO, >0 if OK
+     *
+     *    @param    int $id     Object ID
+     *    @return   int         <0 if KO, >0 if OK
      */
-    function fetch($id)
+	function fetch($id)
     {
     	$sql = "SELECT";
     	$sql.= " t.rowid,";
@@ -155,7 +156,7 @@ class Resource extends CommonObject
    			}
    		}
    		$sql.= " GROUP BY t.rowid";
-   		$sql.= " ORDER BY $sortfield $sortorder " . $this->db->plimit( $limit + 1 ,$offset);
+   		$sql.= " ORDER BY $sortfield $sortorder " . $this->db->plimit($limit + 1, $offset);
    		dol_syslog(get_class($this)."::fetch_all sql=".$sql, LOG_DEBUG);
 
    		$resql=$this->db->query($sql);
@@ -208,7 +209,7 @@ class Resource extends CommonObject
      *  @param	array		$filter    	  filter output
      *  @return int          	<0 if KO, >0 if OK
      */
-    function fetch_all_used($sortorder="ASC",$sortfield="t.rowid",$limit, $offset, $filter=array())
+    function fetch_all_used($sortorder="ASC", $sortfield="t.rowid", $limit=0, $offset=0, $filter=array())
     {
 	//FIXME: limit and offset shouldn't be required
     	$sql="SELECT ";
@@ -236,7 +237,7 @@ class Resource extends CommonObject
     		}
     	}
     	$sql.= " GROUP BY t.resource_id";
-    	$sql.= " ORDER BY $sortfield $sortorder " . $this->db->plimit( $limit + 1 ,$offset);
+    	$sql.= " ORDER BY $sortfield $sortorder " . $this->db->plimit($limit + 1,$offset);
     	dol_syslog(get_class($this)."::fetch_all_used sql=".$sql, LOG_DEBUG);
 
     	$resql=$this->db->query($sql);
@@ -283,7 +284,6 @@ class Resource extends CommonObject
      *
      * Load available resource in array $this->available_resources
      *
-     *
      * @return int 	number of available resources declared by modules
      */
     function fetch_all_available() {
@@ -306,7 +306,7 @@ class Resource extends CommonObject
      *  @param  int		$notrigger	 0=launch triggers after, 1=disable triggers
      *  @return int     		   	 <0 if KO, >0 if OK
      */
-    function update($user=0, $notrigger=0)
+	function update($user=null, $notrigger=0)
     {
     	global $conf, $langs;
 		$error=0;
@@ -342,20 +342,19 @@ class Resource extends CommonObject
         $resql = $this->db->query($sql);
     	if (! $resql) { $error++; $this->errors[]="Error ".$this->db->lasterror(); }
 
-		if (! $error)
-		{
-			if (! $notrigger)
-			{
-	            // Uncomment this and change MYOBJECT to your own tag if you
-	            // want this action calls a trigger.
-
-	            // Call triggers
-	            include_once DOL_DOCUMENT_ROOT . '/core/class/interfaces.class.php';
-	            $interface=new Interfaces($this->db);
-	            $result=$interface->run_triggers('RESOURCE_MODIFY',$this,$user,$langs,$conf);
-	            if ($result < 0) { $error++; $this->errors=$interface->errors; }
-	            // End call triggers
-	    	}
+		if (! $error) {
+			if (!$notrigger) {
+				// Call triggers
+				include_once DOL_DOCUMENT_ROOT . '/core/class/interfaces.class.php';
+				$interface = new Interfaces($this->db);
+				$result = $interface->run_triggers(strtoupper($this->element_type) . '_RESOURCE_MODIFY', $this, $user, $langs, $conf);
+				if ($result < 0) {
+					// FIXME: unused variable
+					$error++;
+					$this->errors = $interface->errors;
+				}
+				// End call triggers
+			}
 		}
 
         // Commit or rollback
@@ -378,7 +377,7 @@ class Resource extends CommonObject
 
 
     /**
-     *
+     * Get properties for element type
      *
      * @param string $element_type Element type project_task
      * @return array
@@ -466,15 +465,19 @@ class Resource extends CommonObject
     /**
      *	Add resources to the actioncom object
      *
-     *	@param		int		$element_id			Element id
-     *	@param		string	$element_type		Element type
-     *	@param		int		$resource_id		Resource id
-     *	@param		string	$resource_type		Resource type
-     *	@param		array	$resource   		Resources linked with element                                                             ct
-     *	@return		int					<=0 if KO, >0 if OK
+     * @param		int		$element_id			Element id
+     * @param		string	$element_type		Element type
+     * @param		int		$resource_id		Resource id
+     * @param		string	$resource_element	Resource type
+     * @param       int     $busy               ?
+     * @param       int     $mandatory          ?
+     * @param       int     $notrigger          Disable all triggers
+     * @return		int					<=0 if KO, >0 if OK
      */
-    function add_element_resource($element_id,$element_type,$resource_id,$resource_element,$busy=0,$mandatory=0)
+	function add_element_resource($element_id,$element_type,$resource_id,$resource_element,$busy=0,$mandatory=0, $notrigger=0)
     {
+	    global $user, $langs, $conf;
+
 	    	$this->db->begin();
 
 	    	$sql = "INSERT INTO ".MAIN_DB_PREFIX."element_resources (";
@@ -497,7 +500,21 @@ class Resource extends CommonObject
 	    	if ($this->db->query($sql))
 	    	{
 	    		$this->db->commit();
-	    		return 1;
+
+			    if (! $notrigger)
+			    {
+				    // Call triggers
+				    include_once DOL_DOCUMENT_ROOT . '/core/class/interfaces.class.php';
+				    $interface=new Interfaces($this->db);
+				    $result=$interface->run_triggers(strtoupper($element_type).'_RESOURCE_ADD',$this,$user,$langs,$conf);
+				    if ($result < 0) {
+					    // FIXME: unused variable
+					    $error++; $this->errors=$interface->errors;
+				    }
+				    // End call triggers
+			    }
+
+			    return 1;
 	    	}
 	    	else
 	    	{
@@ -588,7 +605,7 @@ class Resource extends CommonObject
     			// Call triggers
     			include_once DOL_DOCUMENT_ROOT . '/core/class/interfaces.class.php';
     			$interface=new Interfaces($this->db);
-    			$result=$interface->run_triggers(strtoupper($element).'_DELETE_RESOURCE',$this,$user,$langs,$conf);
+    			$result=$interface->run_triggers(strtoupper($element).'_RESOURCE_DELETE',$this,$user,$langs,$conf);
     			if ($result < 0) {
     				// FIXME: unused variable
 				    $error++; $this->errors=$interface->errors;
