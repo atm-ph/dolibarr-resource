@@ -197,15 +197,18 @@ foreach($eventarray as $day => $event) {
 }
 
 // Resources list
-// FIXME: limit shouldn't be needed
 $resourcestat = new Resource($db);
 $resource_json = array();
-$resourcestat->fetch_all_used('ASC', 't.rowid', 1000000,0);
-foreach($resourcestat->lines as $resource) {
-		$resource_json[] = array(
-			'name' => $resource->objresource->ref,
-			'id' => $resource->objresource->id
-		);
+$resourcestat->fetch_all_used('ASC', 't.rowid', 0,0,array('t.resource_type'=>'building@place'));
+if (is_array($resourcestat->lines) && count($resourcestat->lines)>0) {
+	foreach($resourcestat->lines as $resource) {
+			$resource_json[] = array(
+				'name' => $resource->objresource->ref,
+				'id' => $resource->objresource->id
+			);
+	}
+} else {
+	$resource_json[] = array();
 }
 
 header('Content-Type: application/json');

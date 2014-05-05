@@ -226,20 +226,32 @@ class Resource extends CommonObject
     	//$sql.= " WHERE t.entity IN (".getEntity('resource', true).")";
 
     	//Manage filter
-    	if (!empty($filter)){
+    	if (!empty($filter) && count($filter)>0){
+    		$sqlwhere=array();
     		foreach($filter as $key => $value) {
     			if (strpos($key,'date')) {
-    				$sql.= ' AND '.$key.' = \''.$this->db->idate($value).'\'';
+    				$sqlwhere[]=' '. $key.' = \''.$this->db->idate($value).'\'';
+    			}
+    			elseif ($key=='t.resource_type') {
+    				$sqlwhere[]=' '.$key.' = \''.$this->db->escape($value).'\'';
     			}
     			else {
-    				$sql.= ' AND '.$key.' LIKE \'%'.$value.'%\'';
+    				$sqlwhere[]=' '.$key.' LIKE \'%'.$value.'%\'';
     			}
+    		}
+    		if (count($sqlwhere)>0) {
+    			$sql.= ' WHERE '.implode(' AND ', $sqlwhere);
     		}
     	}
     	$sql.= " GROUP BY t.resource_id";
-    	$sql.= " ORDER BY $sortfield $sortorder " . $this->db->plimit($limit + 1,$offset);
+    	if (!empty($sortfield)) {
+    		$sql.= " ORDER BY ". $sortfield .' '.$sortorder;
+    	}
+    	if (!empty($limit)) {
+    		$this->db->plimit($limit + 1,$offset);
+    	}
+    	
     	dol_syslog(get_class($this)."::fetch_all_used sql=".$sql, LOG_DEBUG);
-
     	$resql=$this->db->query($sql);
     	if ($resql)
     	{
