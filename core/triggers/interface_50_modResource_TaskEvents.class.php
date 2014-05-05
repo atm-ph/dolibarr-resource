@@ -145,7 +145,6 @@ class InterfaceTaskEvents
 				$this->logTrigger($action, $object->id);
 				$this->_task = $object;
 				return $this->createEvent($user);
-				// TODO: add project resources to the event
 			case 'TASK_MODIFY':
 				$this->logTrigger($action, $object->id);
 				$this->_task = $object;
@@ -271,6 +270,7 @@ class InterfaceTaskEvents
 	 */
 	protected function createEvent($user) {
 		require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+		$result = array();
 		$event = new ActionComm($this->db);
 		$event->type_code = 'AC_OTH'; 	// FIXME: Deprecated but still needed parameter, oh well…
 		$event->code = 'AC_TASKEVENT_CREATE';
@@ -282,7 +282,22 @@ class InterfaceTaskEvents
 		$event->datef = $this->_task->date_end;
 		$event->percentage = $this->_task->progress;
 		$event->note = $this->_task->description;
-		return $event->add($user);
+		$result[] = $event->add($user);
+		// Add project resources to the task event
+		if($result > 0) {
+			$this->_task->fetch_projet();
+			// Get project resources
+			dol_include_once('/resource/class/resource.class.php');
+			$resource = new Resource($this->db);
+			$resourcesinfos = $resource->getElementResources($this->_task->projet->element, $this->_task->projet->id);
+			// Add resources to event
+			foreach($resourcesinfos as $resourceinfo) {
+				$result[] = $resource->add_element_resource(
+					$event->id, $event->element, $resourceinfo['resource_id'], $resourceinfo['resource_type'], 0, 0, 1
+				);
+			}
+		}
+		return min($result);
 	}
 
 	/**
