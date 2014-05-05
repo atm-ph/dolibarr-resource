@@ -232,14 +232,18 @@ class InterfaceTaskEvents
 	 */
 	protected function modifyEvent($user) {
 		$event = $this->getEvent();
-		$event->code = 'AC_TASKEVENT_MODIFY';
-		$event->fk_project = $this->_task->fk_project;
-		$event->label = $this->_task->label;
-		$event->datep = $this->_task->date_start;
-		$event->datef = $this->_task->date_end;
-		$event->percentage = $this->_task->progress;
-		$event->note = $this->_task->description;
-		return $event->update($user, true);
+		if(empty($event) === false) {
+			$event->code = 'AC_TASKEVENT_MODIFY';
+			$event->fk_project = $this->_task->fk_project;
+			$event->label = $this->_task->label;
+			$event->datep = $this->_task->date_start;
+			$event->datef = $this->_task->date_end;
+			$event->percentage = $this->_task->progress;
+			$event->note = $this->_task->description;
+			return $event->update($user, true);
+		}
+		// Could not get an event
+		return -1;
 	}
 
 	/**
@@ -249,7 +253,11 @@ class InterfaceTaskEvents
 	 */
 	protected function deleteEvent() {
 		$event = $this->getEvent();
-		return $event->delete();
+		if(empty($event) === false) {
+			return $event->delete();
+		}
+		// Could not get an event
+		return -1;
 	}
 
 	/**
@@ -306,7 +314,7 @@ class InterfaceTaskEvents
 	/**
 	 * Check if event is related to a task
 	 *
-	 * @param CommonObject $object The object to check
+	 * @param ActionComm $object The object to check
 	 * @return bool
 	 */
 	protected function isEventTask($object) {
