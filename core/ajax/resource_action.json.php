@@ -70,9 +70,7 @@ if(is_array($fk_resource) || $fk_resource > 0) {
 $sql.= ' FROM ('.MAIN_DB_PREFIX.'c_actioncomm as ca,';
 $sql.= " ".MAIN_DB_PREFIX.'user as u,';
 $sql.= " ".MAIN_DB_PREFIX."actioncomm as a)";
-if(is_array($fk_resource) || $fk_resource > 0 ) {
-	$sql .= ' LEFT JOIN '.MAIN_DB_PREFIX.'element_resources as r ON a.id = r.element_id ';
-}
+$sql .= ' INNER JOIN '.MAIN_DB_PREFIX.'element_resources as r ON a.id = r.element_id ';
 $sql.= ' WHERE a.fk_action = ca.id';
 // FILTER by date
 if (!empty($start)) {
