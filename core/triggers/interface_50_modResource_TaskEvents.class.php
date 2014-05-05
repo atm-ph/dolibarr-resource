@@ -168,7 +168,7 @@ class InterfaceTaskEvents
 				break;
 			case 'PROJECT_RESOURCE_ADD':
 				$this->logTrigger($action, $object->id);
-				// TODO: add resource to all project tasks
+				return $this->addResourcesToTaskEvents($object);
 			case 'PROJECT_RESOURCE_MODIFY':
 				$this->logTrigger($action, $object->id);
 				// TODO: modify resources on all project tasks
@@ -336,5 +336,34 @@ class InterfaceTaskEvents
 		require_once DOL_DOCUMENT_ROOT.'/projet/class/task.class.php';
 		$this->_task = new Task($this->db);
 		$this->_task->fetch($event->fk_element);
+	}
+
+	/**
+	 * Add resources to task events
+	 *
+	 * @param Resource $resource The resource to add
+	 * @return int
+	 */
+	protected function addResourcesToTaskEvents($resource) {
+		require_once DOL_DOCUMENT_ROOT.'/projet/class/task.class.php';
+		// The passed object is not populated, let's get it
+		$resource->fetch($resource->id);
+		// List all tasks related to project
+		// FIXME: getTasksArray() should be a static function
+		$task = new Task($this->db);
+		$tasklist = $task->getTasksArray(0, 0, $resource->element_id, 0);
+		// List all events related to task
+		$eventlist = array();
+		foreach ($tasklist as $this->_task) {
+			$event = $this->getEvent();
+			if(empty($event) === false) {
+				$eventlist[] = $event;
+			}
+		}
+		// Add the same resource to all events
+		foreach($eventlist as $event) {
+			$result[] = $resource->add_element_resource($event->id, $event->element, $resource->resource_id, $resource->resource_type, 0, 0, 1);
+		}
+		return min($result);
 	}
 }
