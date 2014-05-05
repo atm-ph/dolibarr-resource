@@ -175,7 +175,6 @@ class InterfaceTaskEvents
 			case 'PROJECT_RESOURCE_DELETE':
 				$this->logTrigger($action, $object->id);
 				return $this->deleteResourcesFromTaskEvent($object);
-				// TODO: delete resource from all project tasks
 			case 'ACTION_RESOURCE_ADD':
 				$this->logTrigger($action, $object->id);
 				// TODO: prevent adding resources to eventtasks
@@ -191,16 +190,77 @@ class InterfaceTaskEvents
 	}
 
 	/**
-	 * Log the trigged event
+	 * Get the event related to the task
 	 *
-	 * @param string $action Trigged action
-	 * @param int $id Object id
+	 * @return ActionComm
+	 */
+	private function _getEvent() {
+		require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+		$events = ActionComm::getActions($this->db, 0, $this->_task->id, $this->_task->element);
+		// Only keep event/task events
+		$events = array_filter($events, "self::isEventTask");
+		if (count($events) !== 1) {
+			// TODO: Error, there should not be more than one event linked to a task
+			dol_syslog(
+				"More than one event found, using only first.",
+				LOG_ERR
+			);
+		}
+		// Return ony the first event
+		reset($events);
+		return $events[key($events)];
+	}
+
+	/**
+	 * Get the task related to the event
+	 *
+	 * @param ActionComm $event The event
 	 * @return void
 	 */
-	protected function logTrigger($action, $id) {
-		dol_syslog(
-			"Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $id
-		);
+	private function _getTask($event) {
+		require_once DOL_DOCUMENT_ROOT.'/projet/class/task.class.php';
+		$this->_task = new Task($this->db);
+		$this->_task->fetch($event->fk_element);
+	}
+
+	/**
+	 * Get the list of related task events from a resource
+	 *
+	 * @param Resource $resource The resource
+	 * @return ActionComm[]
+	 */
+	private function getEventList($resource) {
+		require_once DOL_DOCUMENT_ROOT.'/projet/class/task.class.php';
+		// The passed object is not populated, let's get it
+		$resource->fetch($resource->id);
+		// List all tasks related to project
+		// FIXME: getTasksArray() should be a static function
+		$task = new Task($this->db);
+		$tasklist = $task->getTasksArray(0, 0, $resource->element_id, 0);
+		// List all events related to task
+		$eventlist = array();
+		foreach ($tasklist as $this->_task) {
+			$event = $this->_getEvent();
+			if(empty($event) === false) {
+				$eventlist[] = $event;
+			}
+		}
+		return $eventlist;
+	}
+
+	/**
+	 * Check if event is related to a task
+	 *
+	 * @param ActionComm $object The object to check
+	 * @return bool
+	 */
+	protected function isEventTask($object) {
+		// The passed object is partial, let's get it in full
+		$object->fetch($object->id);
+		if(strstr($object->code, 'AC_TASKEVENT') && $object->elementtype==='project_task') {
+			return true;
+		}
+		return false;
 	}
 
 	/**
@@ -232,7 +292,7 @@ class InterfaceTaskEvents
 	 * @return int
 	 */
 	protected function modifyEvent($user) {
-		$event = $this->getEvent();
+		$event = $this->_getEvent();
 		if(empty($event) === false) {
 			$event->code = 'AC_TASKEVENT_MODIFY';
 			$event->fk_project = $this->_task->fk_project;
@@ -253,34 +313,12 @@ class InterfaceTaskEvents
 	 * @return int
 	 */
 	protected function deleteEvent() {
-		$event = $this->getEvent();
+		$event = $this->_getEvent();
 		if(empty($event) === false) {
 			return $event->delete();
 		}
 		// Could not get an event
 		return -1;
-	}
-
-	/**
-	 * Get the event related to the task
-	 *
-	 * @return ActionComm
-	 */
-	protected function getEvent() {
-		require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
-		$events = ActionComm::getActions($this->db, 0, $this->_task->id, $this->_task->element);
-		// Only keep event/task events
-		$events = array_filter($events, "self::isEventTask");
-		if (count($events) !== 1) {
-			// TODO: Error, there should not be more than one event linked to a task
-			dol_syslog(
-				"More than one event found, using only first.",
-				LOG_ERR
-			);
-		}
-		// Return ony the first event
-		reset($events);
-		return $events[key($events)];
 	}
 
 	/**
@@ -291,7 +329,7 @@ class InterfaceTaskEvents
 	 * @return int
 	 */
 	protected function modifyTask($event, $user) {
-		$this->getTask($event);
+		$this->_getTask($event);
 		$this->_task->label = $event->label;
 		$this->_task->date_start = $event->datep;
 		$this->_task->date_end = $event->datef;
@@ -308,60 +346,8 @@ class InterfaceTaskEvents
 	 * @return int
 	 */
 	protected function deleteTask($event, $user) {
-		$this->getTask($event);
+		$this->_getTask($event);
 		return $this->_task->delete($user, true);
-	}
-
-	/**
-	 * Check if event is related to a task
-	 *
-	 * @param ActionComm $object The object to check
-	 * @return bool
-	 */
-	protected function isEventTask($object) {
-		// The passed object is partial, let's get it in full
-		$object->fetch($object->id);
-		if(strstr($object->code, 'AC_TASKEVENT') && $object->elementtype==='project_task') {
-			return true;
-		}
-		return false;
-	}
-
-	/**
-	 * Get the task related to the event
-	 *
-	 * @param ActionComm $event The event
-	 * @return void
-	 */
-	protected function getTask($event) {
-		require_once DOL_DOCUMENT_ROOT.'/projet/class/task.class.php';
-		$this->_task = new Task($this->db);
-		$this->_task->fetch($event->fk_element);
-	}
-
-	/**
-	 * Get the list of related events
-	 *
-	 * @param Resource $resource The resource
-	 * @return ActionComm[]
-	 */
-	protected function getEventList($resource) {
-		require_once DOL_DOCUMENT_ROOT.'/projet/class/task.class.php';
-		// The passed object is not populated, let's get it
-		$resource->fetch($resource->id);
-		// List all tasks related to project
-		// FIXME: getTasksArray() should be a static function
-		$task = new Task($this->db);
-		$tasklist = $task->getTasksArray(0, 0, $resource->element_id, 0);
-		// List all events related to task
-		$eventlist = array();
-		foreach ($tasklist as $this->_task) {
-			$event = $this->getEvent();
-			if(empty($event) === false) {
-				$eventlist[] = $event;
-			}
-		}
-		return $eventlist;
 	}
 
 	/**
@@ -399,4 +385,18 @@ class InterfaceTaskEvents
 		}
 		return min($result);
 	}
+
+	/**
+	 * Log the trigged event
+	 *
+	 * @param string $action Trigged action
+	 * @param int $id Object id
+	 * @return void
+	 */
+	protected function logTrigger($action, $id) {
+		dol_syslog(
+			"Trigger '" . $this->name . "' for action '$action' launched by " . __FILE__ . ". id=" . $id
+		);
+	}
+
 }
