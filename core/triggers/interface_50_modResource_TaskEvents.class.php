@@ -372,6 +372,7 @@ class InterfaceTaskEvents
 	 * @return int
 	 */
 	protected function addResourcesToTaskEvents($resource) {
+		$result = array();
 		$eventlist = $this->getEventList($resource);
 		// Add the same resource to all events
 		foreach($eventlist as $event) {
@@ -387,6 +388,7 @@ class InterfaceTaskEvents
 	 * @return int
 	 */
 	protected function deleteResourcesFromTaskEvent($resource) {
+		$result = array();
 		$eventlist = $this->getEventList($resource);
 		// Remove the resource from all events
 		foreach($eventlist as $event) {
