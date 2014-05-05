@@ -174,6 +174,7 @@ class InterfaceTaskEvents
 				// TODO: modify resources on all project tasks
 			case 'PROJECT_RESOURCE_DELETE':
 				$this->logTrigger($action, $object->id);
+				return $this->deleteResourcesFromTaskEvent($object);
 				// TODO: delete resource from all project tasks
 			case 'ACTION_RESOURCE_ADD':
 				$this->logTrigger($action, $object->id);
@@ -339,21 +340,6 @@ class InterfaceTaskEvents
 	}
 
 	/**
-	 * Add resources to task events
-	 *
-	 * @param Resource $resource The resource to add
-	 * @return int
-	 */
-	protected function addResourcesToTaskEvents($resource) {
-		$eventlist = $this->getEventList($resource);
-		// Add the same resource to all events
-		foreach($eventlist as $event) {
-			$result[] = $resource->add_element_resource($event->id, $event->element, $resource->resource_id, $resource->resource_type, 0, 0, 1);
-		}
-		return min($result);
-	}
-
-	/**
 	 * Get the list of related events
 	 *
 	 * @param Resource $resource The resource
@@ -376,5 +362,41 @@ class InterfaceTaskEvents
 			}
 		}
 		return $eventlist;
+	}
+
+	/**
+	 * Add resources to task events
+	 *
+	 * @param Resource $resource The resource to add
+	 * @return int
+	 */
+	protected function addResourcesToTaskEvents($resource) {
+		$eventlist = $this->getEventList($resource);
+		// Add the same resource to all events
+		foreach($eventlist as $event) {
+			$result[] = $resource->add_element_resource($event->id, $event->element, $resource->resource_id, $resource->resource_type, 0, 0, 1);
+		}
+		return min($result);
+	}
+
+	/**
+	 * Delete
+	 *
+	 * @param Resource $resource The resource to delete
+	 * @return int
+	 */
+	protected function deleteResourcesFromTaskEvent($resource) {
+		$eventlist = $this->getEventList($resource);
+		// Remove the resource from all events
+		foreach($eventlist as $event) {
+			// FIXME: Port to Resource class. It should be possible to delete all resources links in one go
+			$eventresources = $resource->getElementResources($event->element, $event->id);
+			foreach($eventresources as $eventresource) {
+				if($resource->resource_id === $eventresource['resource_id']) {
+					$result[] = $resource->delete_resource($eventresource['rowid'], null, 1);
+				}
+			}
+		}
+		return min($result);
 	}
 }
