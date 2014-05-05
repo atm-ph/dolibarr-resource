@@ -345,6 +345,21 @@ class InterfaceTaskEvents
 	 * @return int
 	 */
 	protected function addResourcesToTaskEvents($resource) {
+		$eventlist = $this->getEventList($resource);
+		// Add the same resource to all events
+		foreach($eventlist as $event) {
+			$result[] = $resource->add_element_resource($event->id, $event->element, $resource->resource_id, $resource->resource_type, 0, 0, 1);
+		}
+		return min($result);
+	}
+
+	/**
+	 * Get the list of related events
+	 *
+	 * @param Resource $resource The resource
+	 * @return ActionComm[]
+	 */
+	protected function getEventList($resource) {
 		require_once DOL_DOCUMENT_ROOT.'/projet/class/task.class.php';
 		// The passed object is not populated, let's get it
 		$resource->fetch($resource->id);
@@ -360,10 +375,6 @@ class InterfaceTaskEvents
 				$eventlist[] = $event;
 			}
 		}
-		// Add the same resource to all events
-		foreach($eventlist as $event) {
-			$result[] = $resource->add_element_resource($event->id, $event->element, $resource->resource_id, $resource->resource_type, 0, 0, 1);
-		}
-		return min($result);
+		return $eventlist;
 	}
 }
