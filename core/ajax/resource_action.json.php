@@ -63,7 +63,8 @@ $sql.= ' a.code, a.note,';
 $sql.= ' a.fk_user_author,a.fk_user_action,a.fk_user_done,';
 $sql.= ' a.priority, a.fulldayevent, a.location,';
 $sql.= ' a.fk_soc, a.fk_contact,';
-$sql.= ' ca.code';
+$sql.= ' ca.code,';
+$sql.= ' a.fk_project';
 if(is_array($fk_resource) || $fk_resource > 0) {
 	$sql.= ', r.resource_id';
 }
@@ -112,49 +113,47 @@ $resql=$db->query($sql);
 if ($resql)
 {
     $num = $db->num_rows($resql);
-    $i=0;
-    while ($i < $num)
-    {
-        $obj = $db->fetch_object($resql);
-        //$transcode=
-        // Create a new object action
-        $event=new ActionComm($db);
-        $resourcestat = new Resource($db);
-
-        $resources = $resourcestat->getElementResources($event->element,$obj->id);
-        if(is_array($resources) && count($resources) > 0)
-        {
-	        $i=0;
-	        foreach($resources as $nb => $resource)
+    if ($num>0) {
+	    while ($obj = $db->fetch_object($resql))
+	    {
+	        //$transcode=
+	        // Create a new object action
+	        $event=new ActionComm($db);
+	        $resourcestat = new Resource($db);
+	
+	        $resources = $resourcestat->getElementResources($event->element,$obj->id);
+	        if(is_array($resources) && count($resources) > 0)
 	        {
-	        	$event->resources[$i] = $resourcestat->fetchObjectByElement($resource['resource_id'],$resource['resource_type']);
-	        	$i++;
+		        $i=0;
+		        foreach($resources as $nb => $resource)
+		        {
+		        	$event->resources[$i] = $resourcestat->fetchObjectByElement($resource['resource_id'],$resource['resource_type']);
+		        	$i++;
+		        }
 	        }
-        }
-
-        $event->id=$obj->id;
-        $event->datep=$db->jdate($obj->datep);      // datep and datef are GMT date
-        $event->datef=$db->jdate($obj->datep2);
-        $event->code=$obj->code;
-        $event->action_code = $langs->transnoentities("Action".$obj->code);
-        $event->libelle=$obj->label;
-        $event->percentage=$obj->percent;
-        $event->author->id=$obj->fk_user_author;	// user id of creator
-        $event->usertodo->id=$obj->fk_user_action;	// user id of owner
-        $event->userdone->id=$obj->fk_user_done;	// deprecated
-		// $event->userstodo=... with s after user, in future version, will be an array with all id of user assigned to event
-        $event->priority=$obj->priority;
-        $event->fulldayevent=$obj->fulldayevent;
-        $event->location=$obj->location;
-        $event->note=$obj->note;
-
-        $event->societe->id=$obj->fk_soc;
-        $event->contact->id=$obj->fk_contact;
-
-        $eventarray[]=$event;
-
-        $i++;
-
+	
+	        $event->id=$obj->id;
+	        $event->datep=$db->jdate($obj->datep);      // datep and datef are GMT date
+	        $event->datef=$db->jdate($obj->datep2);
+	        $event->code=$obj->code;
+	        $event->action_code = $langs->transnoentities("Action".$obj->code);
+	        $event->libelle=$obj->label;
+	        $event->percentage=$obj->percent;
+	        $event->author->id=$obj->fk_user_author;	// user id of creator
+	        $event->usertodo->id=$obj->fk_user_action;	// user id of owner
+	        $event->userdone->id=$obj->fk_user_done;	// deprecated
+			// $event->userstodo=... with s after user, in future version, will be an array with all id of user assigned to event
+	        $event->priority=$obj->priority;
+	        $event->fulldayevent=$obj->fulldayevent;
+	        $event->location=$obj->location;
+	        $event->note=$obj->note;
+	        $event->fk_project=$obj->fk_project;
+	
+	        $event->societe->id=$obj->fk_soc;
+	        $event->contact->id=$obj->fk_contact;
+	
+	        $eventarray[]=$event;
+	    }
     }
 }
 else
@@ -162,38 +161,49 @@ else
     dol_print_error($db);
 }
 
-$event_json = array();
-foreach($eventarray as $day => $event) {
 
-	$description = $event->note;
+dol_syslog("/resource/core.ajax.resource_action.json.php eventarray=".var_export($eventarray,true), LOG_DEBUG);
+$event_json = array();
+foreach($eventarray as $day => $event_to_send) {
+
+	
+	//dol_syslog("/resource/core.ajax.resource_action.json.php event=".var_export($event_to_send,true), LOG_DEBUG);
+	$description = $event_to_send->note;
 	$event_resources = array();
-	if(is_array($event->resources) && count($event->resources) > 0)
+	if(is_array($event_to_send->resources) && count($event_to_send->resources) > 0)
 	{
 		$description.="<br><strong>".$langs->trans('Ressources')."</strong><br>";
-		foreach($event->resources as $resource_event) {
+		foreach($event_to_send->resources as $resource_event) {
 			$description.= $resource_event->getNomUrl();
 			$description.= '<br>';
 			$event_resources[] = $resource_event->id;
 		}
 	}
 
-	$colors = array ('AC_WORKSHOP' => '#95DC16', 'AC_CONFERENC'=> '#F2B579');
+	require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
+	$project=new Project($db);
+	$project->fetch($event_to_send->fk_project);
+
+	
+	//$colors = array ('AC_WORKSHOP' => '#95DC16', 'AC_CONFERENC'=> '#F2B579');
 
 	$event_json[] = array(
-			'id' => $event->id,
-			'title' =>  $event->libelle,
-			'code' => $event->code,
-			'action_code' => $event->action_code,
+			'id' => $event_to_send->id,
+			'title' =>  $project->title.' '.$event_to_send->libelle,
+			'code' => $event_to_send->code,
+			'action_code' => $event_to_send->action_code,
 			'description' =>  $description,
-			'start' => $event->datep,
-			'end' => $event->datef,
-			'allDay' => $event->fulldayevent?true:false,
-			'url' => dol_buildpath("/comm/action/fiche.php",1).'?id='. $event->id,
+			'start' => $event_to_send->datep,
+			'end' => $event_to_send->datef,
+			'allDay' => $event_to_send->fulldayevent?true:false,
+			'url' => dol_buildpath("/comm/action/fiche.php",1).'?id='. $event_to_send->id,
 			// TODO : associer une couleur au thme et la reprendre ici
-			'backgroundColor' => $colors[$event->code],
+			'backgroundColor' => $colors[$event_to_send->code],
 			'resource' => $event_resources
 			//'color' => 'white'
 		);
+	
+	//dol_syslog("/resource/core.ajax.resource_action.json.php event_json=".var_export($event_json,true), LOG_DEBUG);
 }
 
 // Resources list
