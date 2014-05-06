@@ -60,6 +60,7 @@ jQuery(document).ready(function() {
 			right: "resourceDay,resourceWeek,resourceNextWeeks,resourceMonth"
 		},
 		defaultView: "resourceWeek",
+		maxTime: 23.9, // Work around a display bug on the resourceDay view, see https://github.com/jarnokurlin/fullcalendar/issues/15
 		resources: "' . dol_buildpath('/resource/core/ajax/resource_action.json.php?action=resource', 1) . '",
 		events: "' . dol_buildpath('/resource/core/ajax/resource_action.json.php?action=events', 1) . '",
 		eventRender: function(event, element) {
