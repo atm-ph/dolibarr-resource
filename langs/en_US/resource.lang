@@ -19,3 +19,5 @@ PlanningOfAffectedResources=Planning of affected resources
 AddResource=Add a resource
 
 Mandatory=Mandatory
+
+GotoDate=Display this date

@@ -19,3 +19,5 @@ PlanningOfAffectedResources=Planning des ressources affectées aux évènements
 AddResource=Ajouter une resource
 
 Mandatory=Obligatoire
+
+GotoDate=Afficher la date
