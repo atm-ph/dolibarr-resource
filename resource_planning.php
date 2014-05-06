@@ -1,6 +1,7 @@
 <?php
 /* Copyright (C) 2007-2010 Laurent Destailleur  <eldy@users.sourceforge.net>
- * Copyright (C) ---Put here your own copyright and developer email---
+ * Copyright (C) 2013       Jean-François Ferry <jfefe@aternatik.fr>
+ * Copyright (C) 2014       Raphaël Doursenaud  <rdoursenaud@gpcsolutions.fr>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,25 +18,11 @@
  */
 
 /**
- *   	\file       dev/skeletons/skeleton_page.php
- *		\ingroup    mymodule othermodule1 othermodule2
- *		\brief      This file is an example of a php page
- *					Put here some comments
+ *  \file       resource/resource_planning
+ *  \ingroup    resource
+ *  \brief      Resource planning view
  */
 
-//if (! defined('NOREQUIREUSER'))  define('NOREQUIREUSER','1');
-//if (! defined('NOREQUIREDB'))    define('NOREQUIREDB','1');
-//if (! defined('NOREQUIRESOC'))   define('NOREQUIRESOC','1');
-//if (! defined('NOREQUIRETRAN'))  define('NOREQUIRETRAN','1');
-//if (! defined('NOCSRFCHECK'))    define('NOCSRFCHECK','1');			// Do not check anti CSRF attack test
-//if (! defined('NOSTYLECHECK'))   define('NOSTYLECHECK','1');			// Do not check style html tag into posted data
-//if (! defined('NOTOKENRENEWAL')) define('NOTOKENRENEWAL','1');		// Do not check anti POST attack test
-//if (! defined('NOREQUIREMENU'))  define('NOREQUIREMENU','1');			// If there is no need to load and show top and left menu
-//if (! defined('NOREQUIREHTML'))  define('NOREQUIREHTML','1');			// If we don't need to load the html.form.class.php
-//if (! defined('NOREQUIREAJAX'))  define('NOREQUIREAJAX','1');
-//if (! defined("NOLOGIN"))        define("NOLOGIN",'1');				// If this page is public (can be called outside logged session)
-
-// Change this following line to use the correct relative path (../, ../../, etc)
 $res=0;
 if (! $res && file_exists("../main.inc.php")) $res=@include '../main.inc.php';
 if (! $res && file_exists("../../main.inc.php")) $res=@include '../../main.inc.php';					// to work if your module directory is into dolibarr root htdocs directory
@@ -59,6 +46,9 @@ $end			= GETPOST('end','int');
 $fk_resource 	= GETPOST('fk_resource','int');
 
 
+$form = new Form($db);
+
+
 /***************************************************
 * VIEW
 *
@@ -71,10 +61,45 @@ llxHeader('','ResourcePlaning','','','','',$morejs,$morecss,0,0);
 
 $form=new Form($db);
 
+$monthNames=array(	'"'.$langs->trans('Month01').'"',
+				  	'"'.$langs->trans('Month02').'"',
+				 	'"'.$langs->trans('Month03').'"',
+					'"'.$langs->trans('Month04').'"',
+					'"'.$langs->trans('Month05').'"',
+					'"'.$langs->trans('Month06').'"',
+					'"'.$langs->trans('Month07').'"',
+					'"'.$langs->trans('Month08').'"',
+					'"'.$langs->trans('Month09').'"',
+					'"'.$langs->trans('Month10').'"',
+					'"'.$langs->trans('Month11').'"',
+					'"'.$langs->trans('Month12').'"');
+$monthNamesShort=array(	'"'.$langs->trans('MonthShort01').'"',
+		'"'.$langs->trans('MonthShort02').'"',
+		'"'.$langs->trans('MonthShort03').'"',
+		'"'.$langs->trans('MonthShort04').'"',
+		'"'.$langs->trans('MonthShort05').'"',
+		'"'.$langs->trans('MonthShort06').'"',
+		'"'.$langs->trans('MonthShort07').'"',
+		'"'.$langs->trans('MonthShort08').'"',
+		'"'.$langs->trans('MonthShort09').'"',
+		'"'.$langs->trans('MonthShort10').'"',
+		'"'.$langs->trans('MonthShort11').'"',
+		'"'.$langs->trans('MonthShort12').'"');
+$dayNames=array(	'"'.$langs->trans('Monday').'"',
+		'"'.$langs->trans('Tuesday').'"',
+		'"'.$langs->trans('Wednesday').'"',
+		'"'.$langs->trans('Thursday').'"',
+		'"'.$langs->trans('Friday').'"',
+		'"'.$langs->trans('Saturday').'"',
+		'"'.$langs->trans('Sunday').'"');
+$dayNamesShort=array(	'"'.$langs->trans('MondayMin').'"',
+		'"'.$langs->trans('TuesdayMin').'"',
+		'"'.$langs->trans('WednesdayMin').'"',
+		'"'.$langs->trans('ThursdayMin').'"',
+		'"'.$langs->trans('FridayMin').'"',
+		'"'.$langs->trans('SaturdayMin').'"',
+		'"'.$langs->trans('SundayMin').'"');
 
-// Put here content of your page
-
-// Example 1 : Adding jquery code
 print '<script type="text/javascript" language="javascript">
 jQuery(document).ready(function() {
 	$("#calendar").fullCalendar({
@@ -83,6 +108,10 @@ jQuery(document).ready(function() {
 		center: \'title\',
 		right: \'month,agendaWeek,agendaDay\'
 	},
+	monthNames: ['.implode(',',$monthNames).'],
+	monthNamesShort: ['.implode(',',$monthNamesShort).'],
+	dayNames: ['.implode(',',$dayNames).'],
+	dayNamesShort: ['.implode(',',$dayNamesShort).'],
 	defaultView: \'agendaWeek\',
     eventSources: [
 
@@ -98,18 +127,26 @@ jQuery(document).ready(function() {
             },
         }
 
-
-    ]
+	]
 
 });
+                		
+    // Click Function
+	$(":button[name=gotodate]").click(function() {
+		day=$("#select_start_dateday").val();
+		month=$("#select_start_datemonth").val()-1;
+		year=$("#select_start_dateyear").val();
+		datewished= new Date(year, month, day);
+		$("#calendar").fullCalendar( \'gotoDate\', datewished );
+	});	
+                		
 });
 </script>';
 
 $formresource = new FormResource($db);
 
-print $formresource->select_resource_list();
-
-
+print $form->select_date($select_start_date, 'select_start_date', 0, 0, 1,'',1,1);
+print '<input type="button" value="'.$langs->trans('GotoDate').'" id="gotodate" name="gotodate">';
 
 print '<div id="calendar"></div>';
 
