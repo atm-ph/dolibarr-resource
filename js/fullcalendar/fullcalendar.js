@@ -4815,7 +4815,7 @@ function ResourceWeekView(element, calendar) {
 			var end = addDays(cloneDate(start), 7);
 		}
 		else {
-			date = new Date();
+			//date = new Date();
 			var start = addDays(cloneDate(date, true), -((date.getDay() - opt('firstDay') + 7) % 7));
 			var end = addDays(cloneDate(start), 7);
 		}
@@ -4878,7 +4878,7 @@ function ResourceNextWeeksView(element, calendar) {
 			var end = addDays(cloneDate(start), opt('numberOfWeeks') * 7);
 		}
 		else {
-			date = new Date();
+			//date = new Date();
 			var start = addDays(cloneDate(date), -((date.getDay() - opt('firstDay') + weekDays) % weekDays), false);
 			var end = addDays(cloneDate(start), opt('numberOfWeeks')*7);
 		}
@@ -4931,9 +4931,9 @@ function ResourceDayView(element, calendar) {
 			addDays(date, delta * 1);
 			if (!opt('weekends')) skipWeekend(date, delta < 0 ? -1 : 1);
 		}
-		else {
+		/*else {
 			date = new Date();
-		}
+		}*/
 
 		var start = addMinutes(cloneDate(date, true),parseTime(opt('minTime')));
 		var end = addMinutes(cloneDate(start), (parseTime(opt('maxTime'))-parseTime(opt('minTime'))));
