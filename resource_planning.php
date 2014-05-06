@@ -35,6 +35,8 @@ $langs->load("companies");
 $langs->load("other");
 $langs->load("resource@resource");
 
+$form = new Form($db);
+
 //FIXME: missing rights enforcement
 
 /***************************************************
@@ -46,7 +48,7 @@ $morecss=array(
 );
 
 $morejs=array(
-	"/resource/js/fullcalendar/fullcalendar.min.js",
+	"/resource/js/fullcalendar/fullcalendar.js",
 	"/resource/js/jquery.qtip.min.js"
 );
 
