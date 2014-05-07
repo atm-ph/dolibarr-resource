@@ -21,3 +21,8 @@ AddResource=Ajouter une resource
 Mandatory=Obligatoire
 
 GotoDate=Afficher la date
+
+ByDay=Par jour
+ByWeek=Par semaine
+ByNextWeek=Par semaine étendue
+ByMonth=Par mois

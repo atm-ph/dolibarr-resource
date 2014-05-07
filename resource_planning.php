@@ -111,7 +111,8 @@ jQuery(document).ready(function() {
 		resourceDay: \''.$langs->trans('ByDay').'\',
 		resourceWeek: \''.$langs->trans('ByWeek').'\',
 		resourceNextWeeks: \''.$langs->trans('ByNextWeek').'\',
-		resourceMonth: \''.$langs->trans('ByMonth').'\'
+		resourceMonth: \''.$langs->trans('ByMonth').'\',
+		today: \''.$langs->trans('Today').'\',
 		},
 		defaultView: "resourceWeek",
 		resources: "' . dol_buildpath('/resource/core/ajax/resource_action.json.php?action=resource', 1) . '",

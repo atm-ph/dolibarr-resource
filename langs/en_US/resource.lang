@@ -21,3 +21,8 @@ AddResource=Add a resource
 Mandatory=Mandatory
 
 GotoDate=Display this date
+
+ByDay=By Day
+ByWeek=By week
+ByNextWeek=By next week
+ByMonth=By month
