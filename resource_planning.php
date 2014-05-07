@@ -113,6 +113,12 @@ jQuery(document).ready(function() {
 	dayNames: ['.implode(',',$dayNames).'],
 	dayNamesShort: ['.implode(',',$dayNamesShort).'],
 	defaultView: \'agendaWeek\',
+	buttonText: {
+		today: \''.$langs->trans('Today').'\',
+		month: \''.$langs->trans('Month').'\',
+		week: \''.$langs->trans('Week').'\',
+		day: \''.$langs->trans('Day').'\',
+	},
     eventSources: [
 
         // your event source
