@@ -183,6 +183,12 @@ class InterfaceTaskEvents
 			case 'ACTION_RESOURCE_DELETE':
 				$this->logTrigger($action, $object->id);
 				// TODO: don't allow deleting resources on eventtasks
+			case 'PROJECT_DELETE':
+				//TODO : This should be done by task deletion into project delete method, 
+				//but into delete project methods tasks are delete by sql query and not by task delete class method
+				$this->logTrigger($action, $object->id);
+				$this->_project = $object;
+				return $this->deleteProjectEvent();
 			default:
 				return 0;
 		}
@@ -208,6 +214,19 @@ class InterfaceTaskEvents
 		// Return ony the first event
 		reset($events);
 		return $events[key($events)];
+	}
+	
+	/**
+	 * Get the events related to a project
+	 *
+	 * @return array ActionComm
+	 */
+	private function _getProjectEvent() {
+		require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+		$events = ActionComm::getActions($this->db, 0, $this->_project->id, $this->_project->element);
+		// Only keep event/task events
+		$events = array_filter($events, "self::isEventTask");
+		return $events;
 	}
 
 	/**
@@ -333,6 +352,26 @@ class InterfaceTaskEvents
 			return $event->delete();
 		}
 		// Could not get an event
+		return -1;
+	}
+	
+	/**
+	 * Deletes the events related to the project
+	 *
+	 * @return int
+	 */
+	protected function deleteProjectEvent() {
+		$events = $this->_getProjectEvent();
+		$result = true;
+		if (is_array($events) && count($events)>0) {
+			foreach($events as $event) {
+				if(empty($event) === false) {
+					$result = $result && $event->delete();
+				}
+			}
+			return $result;
+		}
+		// Could not get events from the project
 		return -1;
 	}
 
