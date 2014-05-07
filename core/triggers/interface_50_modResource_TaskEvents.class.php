@@ -65,6 +65,11 @@ class InterfaceTaskEvents
 	 * @var Task
 	 */
 	private $_task;
+	
+	/**
+	 * @var Project
+	 */
+	private $_project;
 
 	/**
 	 * Constructor
