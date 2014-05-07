@@ -67,6 +67,11 @@ class InterfaceTaskEvents
 	private $_task;
 
 	/**
+	 * @var Project
+	 */
+	private $_project;
+
+	/**
 	 * Constructor
 	 *
 	 * @param        DoliDB $db Database handler
