@@ -170,6 +170,13 @@ class InterfaceTaskEvents
 					return $this->deleteTask($object, $user);
 				}
 				break;
+			case 'PROJECT_DELETE':
+				//TODO : This should be done by task deletion into project delete method,
+				//but into delete project methods tasks are delete by sql query and not by task delete class method
+				$this->logTrigger($action, $object->id);
+				$this->_project = $object;
+				return $this->deleteProjectEvent();
+				break;
 			case 'PROJECT_RESOURCE_ADD':
 				$this->logTrigger($action, $object->id);
 				return $this->addResourcesToTaskEvents($object);
@@ -188,12 +195,7 @@ class InterfaceTaskEvents
 			case 'ACTION_RESOURCE_DELETE':
 				$this->logTrigger($action, $object->id);
 				// TODO: don't allow deleting resources on eventtasks
-			case 'PROJECT_DELETE':
-				//TODO : This should be done by task deletion into project delete method, 
-				//but into delete project methods tasks are delete by sql query and not by task delete class method
-				$this->logTrigger($action, $object->id);
-				$this->_project = $object;
-				return $this->deleteProjectEvent();
+			
 			default:
 				return 0;
 		}
