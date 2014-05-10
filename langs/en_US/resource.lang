@@ -15,3 +15,5 @@ RessourceLineSuccessfullyDeleted=Resource successfully deleted
 
 ShowResourcePlanning=Show resource planning
 PlanningOfAffectedResources=Planning of affected resources
+
+GotoDate=Display this date
