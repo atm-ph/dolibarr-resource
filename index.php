@@ -73,7 +73,7 @@ $offset = $limit * $page ;
 $pageprev = $page - 1;
 $pagenext = $page + 1;
 
-if( ! $user->rights->place->read)
+if( ! $user->rights->resource->read)
 	accessforbidden();
 
 /***************************************************
