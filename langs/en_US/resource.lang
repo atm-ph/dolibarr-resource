@@ -14,3 +14,5 @@ RessourceLineSuccessfullyUpdated=Resource successfully updated
 RessourceLineSuccessfullyDeleted=Resource successfully deleted
 
 ShowResourcePlanning=Show resource planning
+
+GotoDate=Display this date
