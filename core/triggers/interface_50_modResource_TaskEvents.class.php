@@ -141,7 +141,7 @@ class InterfaceTaskEvents
 	 * @param        User $user Object user
 	 * @param        Translate $langs Object langs
 	 * @param        conf $conf Object conf
-	 * @return        int                        <0 if KO, 0 if no triggered ran, >0 if OK
+	 * @return       int <0 if KO, 0 if no triggered ran, >0 if OK
 	 */
 	public function run_trigger($action, $object, $user, $langs, $conf)
 	{
@@ -175,8 +175,7 @@ class InterfaceTaskEvents
 				return $this->addResourcesToTaskEvents($object);
 			case 'PROJECT_RESOURCE_MODIFY':
 				$this->logTrigger($action, $object->id);
-				// TODO: modify resources on all project tasks
-				return 0;
+				return $this->modifyResourcesInTaskEvents($object);
 			case 'PROJECT_RESOURCE_DELETE':
 				$this->logTrigger($action, $object->id);
 				return $this->deleteResourcesFromTaskEvent($object);
@@ -445,7 +444,32 @@ class InterfaceTaskEvents
 	}
 
 	/**
-	 * Delete
+	 * Modify resources in task events
+	 *
+	 * @param Resource $resource The modified resource
+	 * @return int
+	 */
+	protected function modifyResourcesInTaskEvents($resource) {
+		$result = array();
+		$eventlist = $this->getEventList($resource);
+		foreach($eventlist as $event) {
+			$eventresources = $resource->getElementResources($event->element, $event->id);
+			foreach($eventresources as $eventresource) {
+				if($resource->resource_id === $eventresource['resource_id']) {
+					dol_include_once('/resource/class/resource.class.php');
+					$er = new Resource($this->db);
+					$er->fetch($eventresource['rowid']);
+					$er->busy = $resource->busy;
+					$er->mandatory = $resource->mandatory;
+					$result[] = $er->update(null, true);
+				}
+			}
+		}
+		return min($result);
+	}
+
+	/**
+	 * Delete resource from task event
 	 *
 	 * @param Resource $resource The resource to delete
 	 * @return int
