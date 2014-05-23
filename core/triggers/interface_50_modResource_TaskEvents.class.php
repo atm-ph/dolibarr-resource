@@ -255,7 +255,7 @@ class InterfaceTaskEvents
 	 * @param Resource $resource The resource
 	 * @return ActionComm[]
 	 */
-	private function getEventList($resource) {
+	private function _getEventList($resource) {
 		require_once DOL_DOCUMENT_ROOT.'/projet/class/task.class.php';
 		// The passed object is not populated, let's get it
 		$resource->fetch($resource->id);
@@ -435,7 +435,7 @@ class InterfaceTaskEvents
 	 */
 	protected function addResourcesToTaskEvents($resource) {
 		$result = array();
-		$eventlist = $this->getEventList($resource);
+		$eventlist = $this->_getEventList($resource);
 		// Add the same resource to all events
 		foreach($eventlist as $event) {
 			$result[] = $resource->add_element_resource($event->id, $event->element, $resource->resource_id, $resource->resource_type, 0, 0, 1);
@@ -451,7 +451,7 @@ class InterfaceTaskEvents
 	 */
 	protected function modifyResourcesInTaskEvents($resource) {
 		$result = array();
-		$eventlist = $this->getEventList($resource);
+		$eventlist = $this->_getEventList($resource);
 		foreach($eventlist as $event) {
 			$eventresources = $resource->getElementResources($event->element, $event->id);
 			foreach($eventresources as $eventresource) {
@@ -476,7 +476,7 @@ class InterfaceTaskEvents
 	 */
 	protected function deleteResourcesFromTaskEvent($resource) {
 		$result = array();
-		$eventlist = $this->getEventList($resource);
+		$eventlist = $this->_getEventList($resource);
 		// Remove the resource from all events
 		foreach($eventlist as $event) {
 			// FIXME: Port to Resource class. It should be possible to delete all resources links in one go
