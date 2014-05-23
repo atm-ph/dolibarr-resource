@@ -175,7 +175,7 @@ class InterfaceTaskEvents
 				return $this->addResourcesToTaskEvents($object);
 			case 'PROJECT_RESOURCE_MODIFY':
 				$this->logTrigger($action, $object->id);
-				return $this->modifyResourcesInTaskEvents($object);
+				return $this->modifyResourcesInTaskEvents($object, $user);
 			case 'PROJECT_RESOURCE_DELETE':
 				$this->logTrigger($action, $object->id);
 				return $this->deleteResourcesFromTaskEvent($object);
@@ -468,9 +468,10 @@ class InterfaceTaskEvents
 	 * Modify resources in task events
 	 *
 	 * @param Resource $resource The modified resource
+	 * @param User $user The related user
 	 * @return int
 	 */
-	protected function modifyResourcesInTaskEvents($resource) {
+	protected function modifyResourcesInTaskEvents($resource, $user) {
 		$result = array();
 		$eventresourcelist = $this->_getRelatedEventResources($resource);
 		foreach($eventresourcelist as $elementresource) {
@@ -479,7 +480,7 @@ class InterfaceTaskEvents
 			$eventresource->fetch($elementresource['rowid']);
 			$eventresource->busy = $resource->busy;
 			$eventresource->mandatory = $resource->mandatory;
-			$result[] = $eventresource->update(null, 1);
+			$result[] = $eventresource->update($user, 1);
 		}
 		return min($result);
 	}
