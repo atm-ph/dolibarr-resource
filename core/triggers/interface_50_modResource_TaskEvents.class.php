@@ -275,6 +275,27 @@ class InterfaceTaskEvents
 	}
 
 	/**
+	 * Get the event resources related to the resource
+	 *
+	 * @param Resource $resource The resource
+	 * @return array
+	 */
+	private function _getRelatedEventResources($resource) {
+		$eventresourceslist = array();
+		$eventlist = $this->_getEventList($resource);
+		foreach($eventlist as $event) {
+			$eventresources = $resource->getElementResources($event->element, $event->id);
+			foreach ($eventresources as $eventresource) {
+				// Only keep related eventresources
+				if ($resource->resource_id === $eventresource['resource_id']) {
+					$eventresourceslist[] = $eventresource;
+				}
+			}
+		}
+		return $eventresourceslist;
+	}
+
+	/**
 	 * Check if event is related to a task
 	 *
 	 * @param ActionComm $object The object to check
@@ -451,19 +472,14 @@ class InterfaceTaskEvents
 	 */
 	protected function modifyResourcesInTaskEvents($resource) {
 		$result = array();
-		$eventlist = $this->_getEventList($resource);
-		foreach($eventlist as $event) {
-			$eventresources = $resource->getElementResources($event->element, $event->id);
-			foreach($eventresources as $eventresource) {
-				if($resource->resource_id === $eventresource['resource_id']) {
-					dol_include_once('/resource/class/resource.class.php');
-					$er = new Resource($this->db);
-					$er->fetch($eventresource['rowid']);
-					$er->busy = $resource->busy;
-					$er->mandatory = $resource->mandatory;
-					$result[] = $er->update(null, true);
-				}
-			}
+		$eventresourcelist = $this->_getRelatedEventResources($resource);
+		foreach($eventresourcelist as $elementresource) {
+			dol_include_once('/resource/class/resource.class.php');
+			$eventresource = new Resource($this->db);
+			$eventresource->fetch($elementresource['rowid']);
+			$eventresource->busy = $resource->busy;
+			$eventresource->mandatory = $resource->mandatory;
+			$result[] = $eventresource->update(null, true);
 		}
 		return min($result);
 	}
@@ -476,16 +492,9 @@ class InterfaceTaskEvents
 	 */
 	protected function deleteResourcesFromTaskEvent($resource) {
 		$result = array();
-		$eventlist = $this->_getEventList($resource);
-		// Remove the resource from all events
-		foreach($eventlist as $event) {
-			// FIXME: Port to Resource class. It should be possible to delete all resources links in one go
-			$eventresources = $resource->getElementResources($event->element, $event->id);
-			foreach($eventresources as $eventresource) {
-				if($resource->resource_id === $eventresource['resource_id']) {
-					$result[] = $resource->delete_resource($eventresource['rowid'], null, 1);
-				}
-			}
+		$eventresourcelist = $this->_getRelatedEventResources($resource);
+		foreach($eventresourcelist as $eventresource) {
+			$result[] = $resource->delete_resource($eventresource['rowid'], null, 1);
 		}
 		return min($result);
 	}
