@@ -479,7 +479,7 @@ class InterfaceTaskEvents
 			$eventresource->fetch($elementresource['rowid']);
 			$eventresource->busy = $resource->busy;
 			$eventresource->mandatory = $resource->mandatory;
-			$result[] = $eventresource->update(null, true);
+			$result[] = $eventresource->update(null, 1);
 		}
 		return min($result);
 	}
