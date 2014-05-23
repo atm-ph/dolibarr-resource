@@ -89,8 +89,9 @@ if( (array) $linked_resources && count($linked_resources) > 0)
 			print '</div>';
 
 			print '<div class="tagtd">';
-			print '<a href="'.$_SERVER['PHP_SELF'].'?action=delete_resource&element='.$element.'&element_id='.$element_id.'&lineid='.$linked_resource['rowid'].'">'.$langs->trans('Delete').'</a>';
-			print '<a href="'.$_SERVER['PHP_SELF'].'?mode=edit&resource_type='.$linked_resource['resource_type'].'&element='.$element.'&element_id='.$element_id.'&lineid='.$linked_resource['rowid'].'">'.$langs->trans('Edit').'</a>';
+			print '<a href="'.$_SERVER['PHP_SELF'].'?mode=edit&resource_type='.$linked_resource['resource_type'].'&element='.$element.'&element_id='.$element_id.'&lineid='.$linked_resource['rowid'].'">'.img_edit().'</a>';
+			print '&nbsp;';
+			print '<a href="'.$_SERVER['PHP_SELF'].'?action=delete_resource&element='.$element.'&element_id='.$element_id.'&lineid='.$linked_resource['rowid'].'">'.img_delete().'</a>';
 			print '</div>';
 
 			print '</div>';
