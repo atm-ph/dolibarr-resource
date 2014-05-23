@@ -207,7 +207,14 @@ else
 
 	foreach ($object->available_resources as $modresources => $resources)
 	{
-		$langs->load($modresources);
+		if(is_array($resources)) {
+			foreach ($resources as $langname) {
+				$langs->load($langname);
+			}
+		} else {
+			$langs->load($resources);
+		}
+
 		//print '<h2>'.$modresources.'</h2>';
 		//var_dump($resources);
 
