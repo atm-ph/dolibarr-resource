@@ -72,6 +72,21 @@ class InterfaceTaskEvents
 	private $_project;
 
 	/**
+	 * Check if event is related to a task
+	 *
+	 * @param ActionComm $object The object to check
+	 * @return bool
+	 */
+	static public function isEventTask($object) {
+		// The passed object is partial, let's get it in full
+		$object->fetch($object->id);
+		if(strstr($object->code, 'AC_TASKEVENT') && $object->elementtype==='project_task') {
+			return true;
+		}
+		return false;
+	}
+
+	/**
 	 * Constructor
 	 *
 	 * @param        DoliDB $db Database handler
@@ -179,21 +194,11 @@ class InterfaceTaskEvents
 			case 'PROJECT_RESOURCE_DELETE':
 				$this->logTrigger($action, $object->id);
 				return $this->deleteResourcesFromTaskEvent($object);
-			case 'ACTION_RESOURCE_ADD':
-				$this->logTrigger($action, $object->id);
-				// TODO: prevent adding resources to eventtasks
-				return 0;
-			case 'ACTION_RESOURCE_MODIFY':
-				$this->logTrigger($action, $object->id);
-				// TODO: prevent modifying resources on eventtasks
-				return 0;
-			case 'ACTION_RESOURCE_DELETE':
-				$this->logTrigger($action, $object->id);
-				// TODO: don't allow deleting resources on eventtasks
-				return 0;
 			case 'PROJECT_DELETE':
-				//TODO : This should be done by task deletion into project delete method, 
-				//but into delete project methods tasks are delete by sql query and not by task delete class method
+				/*
+				 * FIXME : This should be done by task deletion into project delete method,
+				 * but into delete project methods tasks are delete by sql query and not by task delete class method
+				 */
 				$this->logTrigger($action, $object->id);
 				$this->_project = $object;
 				return $this->deleteProjectEvent();
@@ -293,21 +298,6 @@ class InterfaceTaskEvents
 			}
 		}
 		return $eventresourceslist;
-	}
-
-	/**
-	 * Check if event is related to a task
-	 *
-	 * @param ActionComm $object The object to check
-	 * @return bool
-	 */
-	protected function isEventTask($object) {
-		// The passed object is partial, let's get it in full
-		$object->fetch($object->id);
-		if(strstr($object->code, 'AC_TASKEVENT') && $object->elementtype==='project_task') {
-			return true;
-		}
-		return false;
 	}
 
 	/**

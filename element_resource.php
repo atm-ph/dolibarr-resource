@@ -201,6 +201,29 @@ else
 		}
 	}
 
+	/*
+	 * Prevent resource modification from event task
+	 */
+	// FIXME: Ugly hack to get access to isEventTask(), factorize into a library?
+	require_once 'core/triggers/interface_50_modResource_TaskEvents.class.php';
+	require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+	$actioncomm = new ActionComm($db);
+	$actioncomm->id = $element_id;
+	if($element_id && $element == 'action' && InterfaceTaskEvents::isEventTask($actioncomm))
+	{
+		$linktext = '<a href="'.
+			dol_buildpath('resource/element_resource.php',1) .
+			'?element=project&element_id=' . $actioncomm->fk_project .
+			'">' .
+			$langs->trans('Project') .
+			'</a>';
+
+		print $langs->trans('EventTaskResourceOnProject', $linktext);
+
+		// We don't want the rest of the page to display
+		llxFooter();
+		exit;
+	}
 
 	print_fiche_titre($langs->trans('ResourcesLinkedToElement'));
 

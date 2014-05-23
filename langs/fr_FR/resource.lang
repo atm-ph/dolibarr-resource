@@ -27,3 +27,5 @@ ByDay=Par jour
 ByWeek=Par semaine
 ByNextWeek=Par semaine étendue
 ByMonth=Par mois
+
+EventTaskResourceOnProject=Les ressources de cet événement doivent être modifiées sur son  %s

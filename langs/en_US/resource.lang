@@ -27,3 +27,5 @@ ByDay=By Day
 ByWeek=By week
 ByNextWeek=By next week
 ByMonth=By month
+
+EventTaskResourceOnProject=This event's resources should be modified from its %s
