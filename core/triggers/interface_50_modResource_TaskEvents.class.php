@@ -65,7 +65,7 @@ class InterfaceTaskEvents
 	 * @var Task
 	 */
 	private $_task;
-
+	
 	/**
 	 * @var Project
 	 */
@@ -298,6 +298,9 @@ class InterfaceTaskEvents
 	 */
 	protected function createEvent($user) {
 		require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+		
+		require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
+		
 		$result = array();
 		$event = new ActionComm($this->db);
 		$event->type_code = 'AC_OTH'; 	// FIXME: Deprecated but still needed parameter, oh well…
@@ -310,6 +313,12 @@ class InterfaceTaskEvents
 		$event->datef = $this->_task->date_end;
 		$event->percentage = $this->_task->progress;
 		$event->note = $this->_task->description;
+		
+		//Find thirdparty link to the project
+		$project=new Project($this->db);
+		$result[] = $project->fetch($this->_task->fk_project);
+		$event->societe->id = $project->socid;
+		
 		$result[] = $event->add($user);
 		// Add project resources to the task event
 		if($result > 0) {
@@ -344,6 +353,12 @@ class InterfaceTaskEvents
 			$event->datef = $this->_task->date_end;
 			$event->percentage = $this->_task->progress;
 			$event->note = $this->_task->description;
+			
+			//Find thirdparty link to the project
+			$project=new Project($this->db);
+			$result[] = $project->fetch($this->_task->fk_project);
+			$event->societe->id = $project->socid;
+			
 			return $event->update($user, true);
 		}
 		// Could not get an event

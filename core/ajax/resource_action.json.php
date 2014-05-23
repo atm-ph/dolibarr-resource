@@ -40,6 +40,7 @@ dol_include_once('/resource/class/resource.class.php');
 // Load traductions files requiredby by page
 $langs->load("companies");
 $langs->load("other");
+$langs->load('bills');
 
 // Get parameters
 $id				= GETPOST('id','int');
@@ -168,14 +169,14 @@ foreach($eventarray as $day => $event_to_send) {
 
 	
 	//dol_syslog("/resource/core.ajax.resource_action.json.php event=".var_export($event_to_send,true), LOG_DEBUG);
-	$description = $event_to_send->note;
+	//$description = $event_to_send->note;
 	$event_resources = array();
 	if(is_array($event_to_send->resources) && count($event_to_send->resources) > 0)
 	{
-		$description.="<br><strong>".$langs->trans('Ressources')."</strong><br>";
+		//$description.="<br><strong>".$langs->trans('Ressources')."</strong><br>";
 		foreach($event_to_send->resources as $resource_event) {
-			$description.= $resource_event->getNomUrl();
-			$description.= '<br>';
+			//$description.= $resource_event->getNomUrl();
+			//$description.= '<br>';
 			$event_resources[] = $resource_event->id;
 		}
 	}
@@ -183,13 +184,52 @@ foreach($eventarray as $day => $event_to_send) {
 	require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
 	$project=new Project($db);
 	$project->fetch($event_to_send->fk_project);
-
+	$project->fetch_thirdparty();
+	$description = "<br><strong>".$langs->trans('Company')."</strong><br>";
+	$description.= $project->thirdparty->name.'<br>'.$project->thirdparty->address.'<BR>'.$project->thirdparty->zip.' '.$project->thirdparty->town;
+	$description.= "<br>".$project->thirdparty->phone;
+	$description.= "<br>".$project->thirdparty->email;
 	
-	//$colors = array ('AC_WORKSHOP' => '#95DC16', 'AC_CONFERENC'=> '#F2B579');
+	//Set color of line depending project status and invoice status link to project 
+	$project_status='draft';
+	$elementarray = $project->get_element_list('invoice');
+	if ($project->statut==0) {
+		$project_status='draft';
+	}elseif ($project->statut==1) {
+		$project_status='valid';
+	} elseif (is_array($elementarray) && count($elementarray)>0) {
+		require_once DOL_DOCUMENT_ROOT.'/compta/facture/class/facture.class.php';
+	
+		$num=count($elementarray);
+		$allinvoicepayed=true;
+		for ($i = 0; $i < $num; $i++)
+		{
+			$element = new Facture($db);
+			$element->fetch($elementarray[$i]);
+			$statuslib=$element->getLibStatut(0);
+			
+			if ($statuslib!=$langs->trans('BillStatusPaid')) {
+				$allinvoicepayed=false;
+			}
+		}
+		if ($allinvoicepayed) {
+			$project_status='closeandpayed';
+		} else {
+			$project_status='closeandunpayed';
+		}
+		
+	} elseif ($project->statut==2) {
+		$project_status='closeandpayed';
+	}
+	
+	
+	//orange : ffab3e
+	$colors = array ('draft' => '#FFAB3E', 'valid'=> '#A9EF4E', 'closeandpayed'=> '#4EC7EF', 'closeandunpayed'=>'#FF563A');
 
 	$event_json[] = array(
 			'id' => $event_to_send->id,
-			'title' =>  $project->title.' '.$event_to_send->libelle,
+			//'title' =>  $project->title.' '.dol_html_entity_decode($event_to_send->libelle, ENT_COMPAT | ENT_HTML401),
+			'title' =>  $project->title.' '.dol_html_entity_decode($event_to_send->libelle, ENT_COMPAT | ENT_HTML401),
 			'code' => $event_to_send->code,
 			'action_code' => $event_to_send->action_code,
 			'description' =>  $description,
@@ -198,7 +238,7 @@ foreach($eventarray as $day => $event_to_send) {
 			'allDay' => $event_to_send->fulldayevent?true:false,
 			'url' => dol_buildpath("/comm/action/fiche.php",1).'?id='. $event_to_send->id,
 			// TODO : associer une couleur au thme et la reprendre ici
-			'backgroundColor' => $colors[$event_to_send->code],
+			'backgroundColor' => $colors[$project_status],
 			'resource' => $event_resources
 			//'color' => 'white'
 		);
