@@ -102,7 +102,6 @@ if ($filtera > 0 || $filtert > 0 || $filterd > 0)
     if ($filterd > 0) $sql.= ($filtera>0||$filtert>0?" OR ":"")." a.fk_user_done = ".$filterd;
     $sql.= ")";
 }
-$sql.= ' AND a.id IN (3449,3450,3451)';
 $sql.= ' GROUP BY a.id';
 // Sort on date
 $sql.= ' ORDER BY datep';
