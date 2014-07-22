@@ -114,7 +114,21 @@ jQuery(document).ready(function() {
 		resourceMonth: \''.$langs->trans('ByMonth').'\',
 		today: \''.$langs->trans('Today').'\',
 		},
-		defaultView: "resourceWeek",
+		defaultView: "resourceMonth",
+		titleFormat: {
+		month: \'MMMM yyyy\',
+		week: "d[ yyyy]{ \'&#8212;\'d [ MMM] yyyy} M\MM",
+		day: \'dddd, d MMM, yyyy\'
+		},
+		columnFormat: {
+			month: \'ddd\',
+			week: \'ddd M/d\',
+			day: \'dddd M/d\',
+			resourceDay: \'H:mm\',
+			resourceMonth: \'d/M\',
+			resourceWeek: \'ddd d/M\',
+			resourceNextWeeks: \'ddd d/M\'
+		},
 		maxTime: 23.9, // Work around a display bug on the resourceDay view, see https://github.com/jarnokurlin/fullcalendar/issues/15
 		resources: "' . dol_buildpath('/resource/core/ajax/resource_action.json.php?action=resource', 1) . '",
 		events: "' . dol_buildpath('/resource/core/ajax/resource_action.json.php?action=events', 1) . '",

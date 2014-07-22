@@ -120,6 +120,10 @@ html .fc,
 	border: 1px solid #ddd;
 	}
 	
+.fc-widget-header.fc-weekend {
+	background: #E6E6E6;
+	}
+	
 .fc-state-highlight { /* <td> today cell */ /* TODO: add .fc-today to <th> */
 	background: #fcf8e3;
 	}

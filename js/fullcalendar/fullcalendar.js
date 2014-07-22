@@ -5220,7 +5220,7 @@ function ResourceView(element, calendar, viewName) {
 			date = indexDate(col);
 			html +=
 				"<th class='" + headerClass + " fc-id " + date.getTime() + 
-					(date.getDay() === 0 || date.getDay() === 6 ? 'fc-weekend' : '') +
+					(date.getDay() === 0 || date.getDay() === 6 ? ' fc-weekend' : '') +
 				"'>" +
 				(showWeekNumbers && (viewName === 'resourceNextWeeks' || viewName === 'resourceMonth') && 
 					date.getDay() === 1 ? "#" + formatDate(date, weekNumberFormat) + "<br>" : "") + 
