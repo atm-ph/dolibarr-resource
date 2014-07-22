@@ -8,6 +8,7 @@ NoResourceInDatabase=Aucune ressource en base de données.
 NoResourceLinked=Aucune ressource liée
 
 ResourcePageIndex=Liste des Ressources
+ResourceElementPage=Ressources
 
 ResourcesLinkedToElement=Ressources liées à l'élément
 RessourceLineSuccessfullyUpdated=Ressource mise à jour
@@ -26,3 +27,5 @@ ByDay=Par jour
 ByWeek=Par semaine
 ByNextWeek=Par semaine étendue
 ByMonth=Par mois
+
+EventTaskResourceOnProject=Les ressources de cet événement doivent être modifiées sur son  %s

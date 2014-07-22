@@ -72,6 +72,21 @@ class InterfaceTaskEvents
 	private $_project;
 
 	/**
+	 * Check if event is related to a task
+	 *
+	 * @param ActionComm $object The object to check
+	 * @return bool
+	 */
+	static public function isEventTask($object) {
+		// The passed object is partial, let's get it in full
+		$object->fetch($object->id);
+		if(strstr($object->code, 'AC_TASKEVENT') && $object->elementtype==='project_task') {
+			return true;
+		}
+		return false;
+	}
+
+	/**
 	 * Constructor
 	 *
 	 * @param        DoliDB $db Database handler
@@ -141,7 +156,7 @@ class InterfaceTaskEvents
 	 * @param        User $user Object user
 	 * @param        Translate $langs Object langs
 	 * @param        conf $conf Object conf
-	 * @return        int                        <0 if KO, 0 if no triggered ran, >0 if OK
+	 * @return       int <0 if KO, 0 if no triggered ran, >0 if OK
 	 */
 	public function run_trigger($action, $object, $user, $langs, $conf)
 	{
@@ -175,26 +190,15 @@ class InterfaceTaskEvents
 				return $this->addResourcesToTaskEvents($object);
 			case 'PROJECT_RESOURCE_MODIFY':
 				$this->logTrigger($action, $object->id);
-				// TODO: modify resources on all project tasks
-				return 0;
+				return $this->modifyResourcesInTaskEvents($object, $user);
 			case 'PROJECT_RESOURCE_DELETE':
 				$this->logTrigger($action, $object->id);
 				return $this->deleteResourcesFromTaskEvent($object);
-			case 'ACTION_RESOURCE_ADD':
-				$this->logTrigger($action, $object->id);
-				// TODO: prevent adding resources to eventtasks
-				return 0;
-			case 'ACTION_RESOURCE_MODIFY':
-				$this->logTrigger($action, $object->id);
-				// TODO: prevent modifying resources on eventtasks
-				return 0;
-			case 'ACTION_RESOURCE_DELETE':
-				$this->logTrigger($action, $object->id);
-				// TODO: don't allow deleting resources on eventtasks
-				return 0;
 			case 'PROJECT_DELETE':
-				//TODO : This should be done by task deletion into project delete method, 
-				//but into delete project methods tasks are delete by sql query and not by task delete class method
+				/*
+				 * FIXME : This should be done by task deletion into project delete method,
+				 * but into delete project methods tasks are delete by sql query and not by task delete class method
+				 */
 				$this->logTrigger($action, $object->id);
 				$this->_project = $object;
 				return $this->deleteProjectEvent();
@@ -256,7 +260,7 @@ class InterfaceTaskEvents
 	 * @param Resource $resource The resource
 	 * @return ActionComm[]
 	 */
-	private function getEventList($resource) {
+	private function _getEventList($resource) {
 		require_once DOL_DOCUMENT_ROOT.'/projet/class/task.class.php';
 		// The passed object is not populated, let's get it
 		$resource->fetch($resource->id);
@@ -276,18 +280,24 @@ class InterfaceTaskEvents
 	}
 
 	/**
-	 * Check if event is related to a task
+	 * Get the event resources related to the resource
 	 *
-	 * @param ActionComm $object The object to check
-	 * @return bool
+	 * @param Resource $resource The resource
+	 * @return array
 	 */
-	protected function isEventTask($object) {
-		// The passed object is partial, let's get it in full
-		$object->fetch($object->id);
-		if(strstr($object->code, 'AC_TASKEVENT') && $object->elementtype==='project_task') {
-			return true;
+	private function _getRelatedEventResources($resource) {
+		$eventresourceslist = array();
+		$eventlist = $this->_getEventList($resource);
+		foreach($eventlist as $event) {
+			$eventresources = $resource->getElementResources($event->element, $event->id);
+			foreach ($eventresources as $eventresource) {
+				// Only keep related eventresources
+				if ($resource->resource_id === $eventresource['resource_id']) {
+					$eventresourceslist[] = $eventresource;
+				}
+			}
 		}
-		return false;
+		return $eventresourceslist;
 	}
 
 	/**
@@ -436,7 +446,7 @@ class InterfaceTaskEvents
 	 */
 	protected function addResourcesToTaskEvents($resource) {
 		$result = array();
-		$eventlist = $this->getEventList($resource);
+		$eventlist = $this->_getEventList($resource);
 		// Add the same resource to all events
 		foreach($eventlist as $event) {
 			$result[] = $resource->add_element_resource($event->id, $event->element, $resource->resource_id, $resource->resource_type, 0, 0, 1);
@@ -445,23 +455,37 @@ class InterfaceTaskEvents
 	}
 
 	/**
-	 * Delete
+	 * Modify resources in task events
+	 *
+	 * @param Resource $resource The modified resource
+	 * @param User $user The related user
+	 * @return int
+	 */
+	protected function modifyResourcesInTaskEvents($resource, $user) {
+		$result = array();
+		$eventresourcelist = $this->_getRelatedEventResources($resource);
+		foreach($eventresourcelist as $elementresource) {
+			dol_include_once('/resource/class/resource.class.php');
+			$eventresource = new Resource($this->db);
+			$eventresource->fetch($elementresource['rowid']);
+			$eventresource->busy = $resource->busy;
+			$eventresource->mandatory = $resource->mandatory;
+			$result[] = $eventresource->update($user, 1);
+		}
+		return min($result);
+	}
+
+	/**
+	 * Delete resource from task event
 	 *
 	 * @param Resource $resource The resource to delete
 	 * @return int
 	 */
 	protected function deleteResourcesFromTaskEvent($resource) {
 		$result = array();
-		$eventlist = $this->getEventList($resource);
-		// Remove the resource from all events
-		foreach($eventlist as $event) {
-			// FIXME: Port to Resource class. It should be possible to delete all resources links in one go
-			$eventresources = $resource->getElementResources($event->element, $event->id);
-			foreach($eventresources as $eventresource) {
-				if($resource->resource_id === $eventresource['resource_id']) {
-					$result[] = $resource->delete_resource($eventresource['rowid'], null, 1);
-				}
-			}
+		$eventresourcelist = $this->_getRelatedEventResources($resource);
+		foreach($eventresourcelist as $eventresource) {
+			$result[] = $resource->delete_resource($eventresource['rowid'], null, 1);
 		}
 		return min($result);
 	}
