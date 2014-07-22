@@ -69,11 +69,11 @@ $sql.= ' a.fk_project';
 if(is_array($fk_resource) || $fk_resource > 0) {
 	$sql.= ', r.resource_id';
 }
-$sql.= ' FROM ('.MAIN_DB_PREFIX.'c_actioncomm as ca,';
-$sql.= " ".MAIN_DB_PREFIX.'user as u,';
-$sql.= " ".MAIN_DB_PREFIX."actioncomm as a)";
-$sql .= ' INNER JOIN '.MAIN_DB_PREFIX.'element_resources as r ON a.id = r.element_id ';
-$sql.= ' WHERE a.fk_action = ca.id';
+$sql.= ' FROM '.MAIN_DB_PREFIX.'c_actioncomm as ca';
+$sql.= " INNER JOIN ".MAIN_DB_PREFIX."actioncomm as a ON a.fk_action = ca.id ";
+$sql.= " INNER JOIN ".MAIN_DB_PREFIX.'user as u ON a.fk_user_author = u.rowid ';
+$sql.= ' INNER JOIN '.MAIN_DB_PREFIX.'element_resources as r ON a.id = r.element_id ';
+$sql.= ' WHERE a.entity IN ('.getEntity('resource', true).')';
 // FILTER by date
 if (!empty($start)) {
 	$sql .= ' AND a.datep2 > ' . $db->idate($start);
@@ -88,8 +88,6 @@ elseif(is_array($fk_resource) and count($fk_resource) > 0)
 {
 	$sql.= " AND r.resource_id IN (".$db->escape(implode(',',$fk_resource)).")";
 }
-$sql.= ' AND a.fk_user_author = u.rowid';
-$sql.= ' AND a.entity IN ('.getEntity('resource', true).')';
 if ($actioncode) $sql.=" AND ca.code='".$db->escape($actioncode)."'";
 if ($pid) $sql.=" AND a.fk_project=".$db->escape($pid);
 
@@ -104,6 +102,7 @@ if ($filtera > 0 || $filtert > 0 || $filterd > 0)
     if ($filterd > 0) $sql.= ($filtera>0||$filtert>0?" OR ":"")." a.fk_user_done = ".$filterd;
     $sql.= ")";
 }
+$sql.= ' AND a.id IN (3449,3450,3451)';
 $sql.= ' GROUP BY a.id';
 // Sort on date
 $sql.= ' ORDER BY datep';
@@ -122,7 +121,7 @@ if ($resql)
 	        $event=new ActionComm($db);
 	        $resourcestat = new Resource($db);
 	
-	        $resources = $resourcestat->getElementResources($event->element,$obj->id);
+	        $resources = $resourcestat->getElementResources($event->element,$obj->id,'building@place');
 	        if(is_array($resources) && count($resources) > 0)
 	        {
 		        $i=0;
@@ -262,6 +261,7 @@ if (is_array($resourcestat->lines) && count($resourcestat->lines)>0) {
 } else {
 	$resource_json[] = array();
 }
+dol_syslog('/resource/core.ajax.resource_action.json.php $resource_json='.var_export($resource_json,true));
 
 header('Content-Type: application/json');
 switch($action) {

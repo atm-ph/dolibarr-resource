@@ -35,6 +35,9 @@ $langs->load("companies");
 $langs->load("other");
 $langs->load("resource@resource");
 
+$select_start_date=dol_mktime(0,0,0,GETPOST('datemonth','int'),GETPOST('dateday','int'),GETPOST('dateyear','int'));
+$nomenu = GETPOST('nomenu','int');
+
 $form = new Form($db);
 
 //FIXME: missing rights enforcement
@@ -152,12 +155,34 @@ jQuery(document).ready(function() {
 		year=$("#select_start_dateyear").val();
 		datewished= new Date(year, month, day);
 		$("#calendar").fullCalendar( \'gotoDate\', datewished );
-	});	
-		
+	});
 });
 </script>';
 
+
+
 llxHeader($fullcalendar, $title, '', '', 0, 0, $morejs, $morecss);
+
+if (!empty($select_start_date)) {
+	print '<script type="text/javascript" language="javascript">
+			jQuery(document).ready(function() {
+					$(":button[name=gotodate]").click();		
+			});
+			</script>';
+}
+
+if (!empty($nomenu)) {
+	print '<style>;
+	div.tmenudiv {display:none;}
+	div#tmenu_tooltip {display:none;}
+	div.login_block {display:none;}
+	div.blockvmenuimpair {display:none;}
+	div.blockvmenupair {display:none;}
+	div.blockvmenusearch {display:none;}
+	div.blockvmenuhelp {display:none;}
+	/*div.vmenu {display:none;}*/
+	</style>';
+}
 
 print $form->select_date($select_start_date, 'select_start_date', 0, 0, 1,'',1,1);
 print '<input type="button" value="'.$langs->trans('GotoDate').'" id="gotodate" name="gotodate">';

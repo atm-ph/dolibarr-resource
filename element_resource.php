@@ -189,11 +189,20 @@ else
 
 			// Ref
 			print '<tr><td width="30%">'.$langs->trans("Ref").'</td><td colspan="3">';
-			print $form->showrefnav($act, 'id', $linkback, ($user->societe_id?0:1), 'id', 'ref', '');
+			print $form->showrefnav($act, 'id', $linkback, ($user->societe_id?0:1), 'rowid', 'ref', '');
 			print '</td></tr>';
 
 			// Title
 			print '<tr><td>'.$langs->trans("Title").'</td><td colspan="3">'.$act->title.'</td></tr>';
+			 // Date start
+		    print '<tr><td>'.$langs->trans("DateStart").'</td><td>';
+		    print dol_print_date($act->date_start,'daytext');
+		    print '</td></tr>';
+		
+		    // Date end
+		    print '<tr><td>'.$langs->trans("DateEnd").'</td><td>';
+		    print dol_print_date($act->date_end,'daytext');
+		    print '</td></tr>';
 
 			print '</table>';
 
@@ -203,7 +212,6 @@ else
 
 
 	print_fiche_titre($langs->trans('ResourcesLinkedToElement'));
-
 
 	foreach ($object->available_resources as $modresources => $resources)
 	{
