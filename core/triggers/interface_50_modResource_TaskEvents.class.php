@@ -405,8 +405,13 @@ class InterfaceTaskEvents
 			}
 			return $result;
 		}
-		// Could not get events from the project
-		return -1;
+		if ($events==-1) {
+			// Could not get events from the project
+			return -1;
+		} else {
+			return 0;
+		}
+		
 	}
 
 	/**
