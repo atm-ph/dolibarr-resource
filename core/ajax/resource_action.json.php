@@ -252,8 +252,15 @@ $resource_json = array();
 $resourcestat->fetch_all_used('ASC', 't.rowid', 0,0,array('t.resource_type'=>'building@place'));
 if (is_array($resourcestat->lines) && count($resourcestat->lines)>0) {
 	foreach($resourcestat->lines as $resource) {
+		
+			if (!empty($resource->objresource->place->ref)) {
+				$label=$resource->objresource->place->ref .'-'. $resource->objresource->ref;
+			} else {
+				$label=$resource->objresource->ref;
+			}
+		
 			$resource_json[] = array(
-				'name' => $resource->objresource->ref,
+				'name' => $label,
 				'id' => $resource->objresource->id
 			);
 	}

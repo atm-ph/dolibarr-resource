@@ -81,20 +81,22 @@ $monthNamesShort=array(	'"'.$langs->trans('MonthShort01').'"',
 		'"'.$langs->trans('MonthShort10').'"',
 		'"'.$langs->trans('MonthShort11').'"',
 		'"'.$langs->trans('MonthShort12').'"');
-$dayNames=array(	'"'.$langs->trans('Monday').'"',
+$dayNames=array('"'.$langs->trans('Sunday').'"',
+		'"'.$langs->trans('Monday').'"',
 		'"'.$langs->trans('Tuesday').'"',
 		'"'.$langs->trans('Wednesday').'"',
 		'"'.$langs->trans('Thursday').'"',
 		'"'.$langs->trans('Friday').'"',
 		'"'.$langs->trans('Saturday').'"',
-		'"'.$langs->trans('Sunday').'"');
-$dayNamesShort=array(	'"'.$langs->trans('MondayMin').'"',
+		);
+$dayNamesShort=array('"'.$langs->trans('SundayMin').'"',
+		'"'.$langs->trans('MondayMin').'"',
 		'"'.$langs->trans('TuesdayMin').'"',
 		'"'.$langs->trans('WednesdayMin').'"',
 		'"'.$langs->trans('ThursdayMin').'"',
 		'"'.$langs->trans('FridayMin').'"',
 		'"'.$langs->trans('SaturdayMin').'"',
-		'"'.$langs->trans('SundayMin').'"');
+		);
 
 $fullcalendar = '<script type="text/javascript" language="javascript">
 jQuery(document).ready(function() {
