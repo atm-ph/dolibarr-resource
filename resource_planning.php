@@ -161,7 +161,10 @@ jQuery(document).ready(function() {
 });
 </script>';
 
-
+if (!empty($nomenu)) {
+	$conf->dol_hide_topmenu=1;
+	$conf->dol_hide_leftmenu=1;
+}
 
 llxHeader($fullcalendar, $title, '', '', 0, 0, $morejs, $morecss);
 
