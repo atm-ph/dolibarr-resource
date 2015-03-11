@@ -6297,12 +6297,6 @@ function ResourceEventRenderer() {
 				right = seg.isEnd ? colContentRight(rightCol) : maxLeft;
 			}
 			
-			//Ugly hack to reder correctly event in next week and months views
-			if (viewName == 'resourceNextWeeks' || viewName == 'resourceMonth') {
-				left=left-15;
-				right=right-14;
-			}
-			
 			classes = classes.concat(event.className);
 			if (event.source) {
 				classes = classes.concat(event.source.className || []);

@@ -254,7 +254,7 @@ if (is_array($resourcestat->lines) && count($resourcestat->lines)>0) {
 	foreach($resourcestat->lines as $resource) {
 		
 			if (!empty($resource->objresource->place->ref)) {
-				$label=$resource->objresource->place->ref .'-'. $resource->objresource->ref;
+				$label=$resource->objresource->place->ref .'<BR>'. $resource->objresource->ref;
 			} else {
 				$label=$resource->objresource->ref;
 			}
