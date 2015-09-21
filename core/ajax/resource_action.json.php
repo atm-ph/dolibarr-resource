@@ -252,10 +252,22 @@ foreach ( $eventarray as $day => $event_to_send ) {
 					'closeandunpayed' => '#FF563A' 
 			);
 			
+			//Ack for reduce event calendar description
+			if ($event_to_send->libelle=='Montage') {
+				$event_to_send->libelle='M';
+			}
+			if ($event_to_send->libelle=='D&eacute;montage') {
+				$event_to_send->libelle='D';
+			}
+			if ($event_to_send->libelle=='Exploitation') {
+				$event_to_send->libelle='E';
+			}
+			
+			
 			$event_json[] = array (
 					'id' => $event_to_send->id,
 					// 'title' => $project->title.' '.dol_html_entity_decode($event_to_send->libelle, ENT_COMPAT | ENT_HTML401),
-					'title' => $project->title . ' ' . dol_html_entity_decode($event_to_send->libelle, ENT_COMPAT | ENT_HTML401),
+					'title' => dol_trunc($project->title,10) . ' ' . $event_to_send->libelle,
 					'code' => $event_to_send->code,
 					'action_code' => $event_to_send->action_code,
 					'description' => $description,
