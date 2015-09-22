@@ -209,7 +209,8 @@ foreach ( $eventarray as $day => $event_to_send ) {
 				}
 			}
 			
-			$description = "<br><strong>" . $langs->trans('Company') . "</strong><br>";
+			$description = '<strong>'.$project->title . ' ' . $event_to_send->libelle.'</strong><br>';
+			$description .= "<br><strong>" . $langs->trans('Company') . "</strong><br>";
 			$description .= $project->thirdparty->name . '<br>' . $project->thirdparty->address . '<BR>' . $project->thirdparty->zip . ' ' . $project->thirdparty->town;
 			$description .= "<br>" . $project->thirdparty->phone;
 			$description .= "<br>" . $project->thirdparty->email;
