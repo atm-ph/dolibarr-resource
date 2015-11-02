@@ -148,7 +148,7 @@ if ($resql) {
 			$event->author->id = $obj->fk_user_author; // user id of creator
 			$event->usertodo->id = $obj->fk_user_action; // user id of owner
 			$event->userdone->id = $obj->fk_user_done; // deprecated
-			                                         // $event->userstodo=... with s after user, in future version, will be an array with all id of user assigned to event
+			                                           // $event->userstodo=... with s after user, in future version, will be an array with all id of user assigned to event
 			$event->priority = $obj->priority;
 			$event->fulldayevent = $obj->fulldayevent;
 			$event->location = $obj->location;
@@ -183,17 +183,23 @@ foreach ( $eventarray as $day => $event_to_send ) {
 		$num = 0;
 		$elementarray = $project->get_element_list('propal');
 		if (count($elementarray) > 0 && is_array($elementarray)) {
-			require_once DOL_DOCUMENT_ROOT . '/comm/propal/class/propal.class.php';
 			$num = count($elementarray);
 			for($i = 0; $i < $num; $i ++) {
-				$element = new Propal($db);
-				$element->fetch($elementarray[$i]);
-				if ($element->statut == 3) {
-					$unsigned ++;
+				if (! empty($elementarray[$i])) {
+					$sql_inner = 'SELECT rowid,fk_statut FROM ' . MAIN_DB_PREFIX . 'propal WHERE rowid=' . $elementarray[$i];
+					$resql_inner = $db->query($sql_inner);
+					if (! $resql_inner) {
+						setEventMessage($db->error, 'errors');
+					} else {
+						$element = $db->fetch_object($resql_inner);
+						if ($element->fk_statut == 3) {
+							$unsigned ++;
+						}
+					}
 				}
 			}
 		}
-		if ($unsigned == $num && !empty($unsigned) && !empty($num)) {
+		if ($unsigned == $num && ! empty($unsigned) && ! empty($num)) {
 			$addevent = false;
 		}
 		if ($addevent) {
@@ -209,7 +215,7 @@ foreach ( $eventarray as $day => $event_to_send ) {
 				}
 			}
 			
-			$description = '<strong>'.$project->title . ' ' . $event_to_send->libelle.'</strong><br>';
+			$description = '<strong>' . $project->title . ' ' . $event_to_send->libelle . '</strong><br>';
 			$description .= "<br><strong>" . $langs->trans('Company') . "</strong><br>";
 			$description .= $project->thirdparty->name . '<br>' . $project->thirdparty->address . '<BR>' . $project->thirdparty->zip . ' ' . $project->thirdparty->town;
 			$description .= "<br>" . $project->thirdparty->phone;
@@ -253,22 +259,21 @@ foreach ( $eventarray as $day => $event_to_send ) {
 					'closeandunpayed' => '#FF563A' 
 			);
 			
-			//Ack for reduce event calendar description
-			if ($event_to_send->libelle=='Montage') {
-				$event_to_send->libelle='M';
+			// Ack for reduce event calendar description
+			if ($event_to_send->libelle == 'Montage') {
+				$event_to_send->libelle = 'M';
 			}
-			if ($event_to_send->libelle=='D&eacute;montage') {
-				$event_to_send->libelle='D';
+			if ($event_to_send->libelle == 'D&eacute;montage') {
+				$event_to_send->libelle = 'D';
 			}
-			if ($event_to_send->libelle=='Exploitation') {
-				$event_to_send->libelle='E';
+			if ($event_to_send->libelle == 'Exploitation') {
+				$event_to_send->libelle = 'E';
 			}
-			
 			
 			$event_json[] = array (
 					'id' => $event_to_send->id,
 					// 'title' => $project->title.' '.dol_html_entity_decode($event_to_send->libelle, ENT_COMPAT | ENT_HTML401),
-					'title' => dol_trunc($project->title,10) . ' ' . $event_to_send->libelle,
+					'title' => dol_trunc($project->title, 10) . ' ' . $event_to_send->libelle,
 					'code' => $event_to_send->code,
 					'action_code' => $event_to_send->action_code,
 					'description' => $description,
