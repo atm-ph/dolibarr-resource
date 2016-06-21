@@ -1,0 +1,7 @@
+#calendar .fc-event-title {
+	word-wrap:break-word;
+}
+
+#calendar th.fc-widget-header {
+	width:49px;
+}
