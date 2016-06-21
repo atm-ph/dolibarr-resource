@@ -103,7 +103,6 @@ $dayNamesShort=array('"'.$langs->trans('SundayMin').'"',
 
 $fullcalendar = '<script type="text/javascript" language="javascript">
 jQuery(document).ready(function() {
-	var alreadyDone = false;
 	$("#calendar").fullCalendar({
 		header: {
 			left: "prev,next today",
@@ -152,12 +151,10 @@ jQuery(document).ready(function() {
 				}
 			});
 		},
-		eventAfterAllRender: function(view) {
-			if (!alreadyDone) {
-				alreadyDone = true;
-				// FIX unaligned box => @see http://stackoverflow.com/questions/21519947/jquery-fullcalendar-can-i-programmatically-resize-the-calendar
-				$("#calendar").fullCalendar("option", "aspectRatio", 1.35);
-			}
+		viewRender: function(view, element) {
+			setTimeout(function() {
+				$(window).trigger("resize");	
+			}, 1);
 		}
 	});
 				
