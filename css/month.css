@@ -1,0 +1,61 @@
+#title_planning {
+	font-size:14px;
+	font-weight:bold;
+}
+
+#planning {
+	border-collapse:collapse;
+	width:3300px;
+}
+
+#planning td {
+	border:1px solid #ddd;
+}
+
+#planning td.today {
+	background:#FCF8E3;
+	
+}
+
+#planning td.noborder {
+ 	border-top-color:#fff;
+ 	border-left-color:#fff;
+}
+ 
+#planning td {
+	padding:0;
+	vertical-align:top;
+	position:relative;
+}
+
+#planning  td.resource_name {
+	font-weight:bold;
+	font-size:13px;
+	padding:5px;
+	width:155px;
+}
+
+#planning td.date {
+	width:110px;
+	max-width:110px;
+	font-weight:bold;
+}
+
+#planning td.colDay {
+	font-weight:bold;
+	text-align:center;
+	width:110px;
+}
+
+#planning td.weekend {
+	background: #e6e6e6;
+}
+
+#planning .event {
+	/*background:#ffab3e;*/
+	border-radius:3px;
+	border: 1px solid #999;
+	position:absolute;
+	z-index:5;
+}
+

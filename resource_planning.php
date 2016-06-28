@@ -103,6 +103,7 @@ $dayNamesShort=array('"'.$langs->trans('SundayMin').'"',
 
 $fullcalendar = '<script type="text/javascript" language="javascript">
 jQuery(document).ready(function() {
+	
 	$("#calendar").fullCalendar({
 		header: {
 			left: "prev,next today",
@@ -124,9 +125,9 @@ jQuery(document).ready(function() {
 		},
 		defaultView: "resourceMonth",
 		titleFormat: {
-		month: \'MMMM yyyy\',
-		week: "d[ yyyy]{ \'&#8212;\'d [ MMM] yyyy} M\MM",
-		day: \'dddd, d MMM, yyyy\'
+			month: \'MMMM yyyy\',
+			week: "d[ yyyy]{ \'&#8212;\'d [ MMM] yyyy} M\MM",
+			day: \'dddd, d MMM, yyyy\'
 		},
 		columnFormat: {
 			month: \'ddd\',
@@ -152,6 +153,15 @@ jQuery(document).ready(function() {
 			});
 		},
 		viewRender: function(view, element) {
+			if (view.name == "resourceMonth")
+			{
+				var month = ("0" + (view.start.getMonth() + 1)).slice(-2);
+				var year = view.start.getFullYear();
+				
+				var url = "'.dol_buildpath('/resource/month.php', 2).'?month="+month+"&year="+year+"&optioncss=print";
+				$("#link_to_print").attr("href", url);
+			}
+			
 			setTimeout(function() {
 				$(window).trigger("resize");	
 			}, 1);
@@ -201,6 +211,8 @@ print $form->select_date($select_start_date, 'select_start_date', 0, 0, 1,'',1,1
 print '<input type="button" value="'.$langs->trans('GotoDate').'" id="gotodate" name="gotodate">';
 
 print '<div id="calendar"></div>';
+
+print '<div class="tabsAction"><a id="link_to_print" href="#" class="button butAction">'.$langs->trans('ShowMonthToPrint').'</a></div>';
 
 // Page end
 llxFooter();

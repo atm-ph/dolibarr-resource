@@ -263,14 +263,14 @@ foreach ( $eventarray as $day => $event_to_send ) {
 			if ($event_to_send->libelle == 'Montage') {
 				$event_to_send->libelle = 'M';
 			}
-			if ($event_to_send->libelle == 'D&eacute;montage') {
+			if ($event_to_send->libelle == 'D&eacute;montage' || $event_to_send->libelle == 'Démontage') {
 				$event_to_send->libelle = 'D';
 			}
 			if ($event_to_send->libelle == 'Exploitation') {
 				$event_to_send->libelle = 'E';
 			}
 			
-			if ($conf->global->RESOURCE_SHOW_PROJECT_NAME) $title = $project->title . ' ' . $event_to_send->libelle;
+			if (!empty($conf->global->RESOURCE_SHOW_PROJECT_NAME)) $title = $project->title . ' ' . $event_to_send->libelle;
 			else $title = dol_trunc($project->title, 10) . ' ' . $event_to_send->libelle;
 			
 			$event_json[] = array (
