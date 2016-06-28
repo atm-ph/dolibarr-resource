@@ -29,3 +29,5 @@ ByNextWeek=Par semaine étendue
 ByMonth=Par mois
 
 EventTaskResourceOnProject=Les ressources de cet événement doivent être modifiées sur son  %s
+
+ShowMonthToPrint=Affichage au mois pour impression

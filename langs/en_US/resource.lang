@@ -29,3 +29,5 @@ ByNextWeek=By next week
 ByMonth=By month
 
 EventTaskResourceOnProject=This event's resources should be modified from its %s
+
+ShowMonthToPrint=Show month to print
