@@ -73,7 +73,7 @@ llxHeader('', 'Planning '.$month.' '.$year, '', '', 0, 0, array(), array('/resou
 		}
 		
 		function constructTable(data_resource, data_events) {
-			var nbCol = <?echo (int) $nb_jours; ?>
+			var nbCol = <?php echo (int) $nb_jours; ?>
 				,table = $('#planning')
 				,today = <?php echo $today; ?>
 				,year = <?php echo $year; ?>
