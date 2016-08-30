@@ -307,13 +307,25 @@ class InterfaceTaskEvents
 	 * @return int
 	 */
 	protected function createEvent($user) {
-		require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
+		global $langs;
 		
+		$langs->load("quimperevenement@quimperevenement");
+		
+		require_once DOL_DOCUMENT_ROOT.'/comm/action/class/actioncomm.class.php';
 		require_once DOL_DOCUMENT_ROOT.'/projet/class/project.class.php';
+		
+		$type_code = 'AC_OTH';
+		if ($this->_task->label == $langs->trans("TaskMontage")) {
+			$type_code = 'EVT_MONTAGE';
+		} elseif ($this->_task->label == $langs->trans("TaskExploitation")) {
+			$type_code = 'EVT_EXPLOITA';
+		} elseif ($this->_task->label == $langs->trans("TaskDemontage")) {
+			$type_code = 'EVT_DEMONTAG';
+		}
 		
 		$result = array();
 		$event = new ActionComm($this->db);
-		$event->type_code = 'AC_OTH'; 	// FIXME: Deprecated but still needed parameter, oh well…
+		$event->type_code = $type_code; 	// FIXME: Deprecated but still needed parameter, oh well…
 		$event->code = 'AC_TASKEVENT_CREATE';
 		$event->elementtype = $this->_task->element;
 		$event->fk_element = $this->_task->id;
@@ -456,7 +468,9 @@ class InterfaceTaskEvents
 		foreach($eventlist as $event) {
 			$result[] = $resource->add_element_resource($event->id, $event->element, $resource->resource_id, $resource->resource_type, 0, 0, 1);
 		}
-		return min($result);
+		
+		if (!empty($result)) return min($result);
+		else return false;
 	}
 
 	/**
