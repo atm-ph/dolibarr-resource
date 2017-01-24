@@ -33,10 +33,26 @@ $TMonth = array(
 	,'12' => 'Décembre'
 );
 
+
+$conf->dol_hide_topmenu = $conf->dol_hide_topmenu = 1;
+
 llxHeader('', 'Planning '.$month.' '.$year, '', '', 0, 0, array(), array('/resource/css/month.css'));
 
-?>
+$width_col = floor( 90 / (int)date('t',$today) * 100) / 100;
 
+?>
+<style type="text/css">
+#planning {
+	width:420mm;
+}
+#planning td.resource_name {
+	width:10%;
+}
+
+#planning td.date,#planning td.colDay {
+	width:<?php echo $width_col ?>%;
+}
+</style>
 <p id="title_planning">Planning : <?php echo $TMonth[$month].' '.$year; ?></p>
 <table id="planning">
 	<tr id="row-day">
